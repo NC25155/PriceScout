@@ -13,6 +13,18 @@ HYPERMAX_URL = "https://www.talabat.com/bahrain/grocery/711604/hypermax-riffa-al
 AL_JAZIRA_URL = "https://www.talabat.com/bahrain/grocery/727495/al-jazira-supermarket-hamala"
 TALAL_URL = "https://www.talabat.com/bahrain/grocery/718139/talal-markets-arad-new"
 
+# Each linked source is tied to one specific branch, and Talabat shows
+# stock/prices based on the delivery address selected in-app. This maps
+# each store's entry here to the actual area its link covers, so the
+# app can offer a city filter instead of silently mismatching.
+STORE_CITY = {
+    "LuLu": "All Bahrain",       # LuLu's online catalog is nationwide, not branch-locked
+    "Alosra": "Juffair",         # linked branch: Alosra Al Juffair
+    "HyperMax": "Riffa",         # linked branch: HyperMax Riffa Al Shamali / North Riffa
+    "Al Jazira": "Hamala",       # linked branch: Al Jazira Supermarket Hamala
+    "Talal Markets": "Arad",     # linked branch: Talal Markets Arad New
+}
+
 
 def demo_products():
 
@@ -147,6 +159,7 @@ def demo_products():
             "product_name": name,
             "category": category,
             "store": store,
+            "city": STORE_CITY.get(store, "All Bahrain"),
             "price": price,
             "original_price": original_price,
             "quantity": quantity,

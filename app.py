@@ -125,6 +125,25 @@ category = st.sidebar.selectbox(
     categories
 )
 
+cities = [
+    "All",
+    "All Bahrain (LuLu only)",
+    "Juffair",
+    "Riffa",
+    "Hamala",
+    "Arad"
+]
+
+city = st.sidebar.selectbox(
+    "Your city / area",
+    cities,
+    help=(
+        "LuLu's online catalog covers all of Bahrain. The other "
+        "stores are linked to one specific branch, so pick the area "
+        "closest to you to see offers that actually match that branch."
+    )
+)
+
 search = st.sidebar.text_input(
     "Search",
     placeholder="chicken, water..."
@@ -151,6 +170,21 @@ if category != "All":
     filtered = [
         p for p in filtered
         if p["category"] == category
+    ]
+
+
+if city == "All Bahrain (LuLu only)":
+
+    filtered = [
+        p for p in filtered
+        if p["city"] == "All Bahrain"
+    ]
+
+elif city != "All":
+
+    filtered = [
+        p for p in filtered
+        if p["city"] in (city, "All Bahrain")
     ]
 
 
@@ -226,7 +260,7 @@ with compare_tab:
                 )
 
                 st.write(
-                    f'🏪 {product["store"]}'
+                    f'🏪 {product["store"]} · 📍 {product["city"]}'
                 )
 
                 st.write(
@@ -279,6 +313,15 @@ with compare_tab:
                 st.caption(
                     f"Source: {source}"
                 )
+
+                if product["store"] != "LuLu":
+
+                    st.caption(
+                        "⚠️ This source is a delivery-app storefront. "
+                        "Stock and prices shown there depend on the "
+                        "delivery address selected, so they may differ "
+                        "from what appears here."
+                    )
 
             st.divider()
 
