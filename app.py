@@ -99,11 +99,25 @@ st.sidebar.header("🔎 Search")
 categories = [
     "All",
     "Chicken",
+    "Meat & Seafood",
     "Water",
     "Milk",
+    "Dairy & Cheese",
     "Rice",
     "Eggs",
-    "Cleaning"
+    "Cleaning",
+    "Bakery",
+    "Cooking Oil",
+    "Fruits & Vegetables",
+    "Dates & Dried Fruit",
+    "Snacks",
+    "Frozen Food",
+    "Beverages",
+    "Coffee & Tea",
+    "Canned Goods",
+    "Pasta & Noodles",
+    "Spices & Condiments",
+    "Personal Care"
 ]
 
 category = st.sidebar.selectbox(
