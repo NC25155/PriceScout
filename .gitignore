@@ -9,3 +9,5 @@ venv/
 data/*.db
 
 .streamlit/secrets.toml
+
+# Keep local environments, secrets, and generated files out of Git.
