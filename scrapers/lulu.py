@@ -217,7 +217,7 @@ def classify_product(name):
         ("Rice", ("rice", "basmati", "calrose", "matta")),
         ("Flour & Baking", ("flour", "semolina", "baking", "yeast")),
         ("Sugar", ("sugar",)),
-        ("Cooking Oil", ("oil", "sunflower", "corn oil", "vegetable oil")),
+        ("Cooking Oil", ("cooking oil", "sunflower oil", "corn oil", "vegetable oil", "olive oil")),
         ("Laundry", ("detergent", "washing powder", "fabric softener", "softener")),
         ("Paper & Tissue", ("tissue", "toilet roll", "toilet paper", "paper towel")),
         ("Cleaning", ("cleaner", "disinfectant", "bleach", "windex", "dishwash")),
@@ -228,8 +228,8 @@ def classify_product(name):
         ("Frozen Food", ("frozen", "fries", "paratha")),
         ("Breakfast", ("oats", "cereal", "corn flakes")),
         ("Water", ("water",)),
-        ("Fruits & Vegetables", ("tomato", "cucumber", "potato", "onion", "carrot", "apple", "banana")),
         ("Canned Goods", ("canned", "tomato paste", "tuna", "chickpeas")),
+        ("Fruits & Vegetables", ("tomato", "cucumber", "potato", "onion", "carrot", "apple", "banana")),
         ("Pasta & Noodles", ("pasta", "spaghetti", "noodles", "macaroni")),
     ]
     for category, words in groups:
