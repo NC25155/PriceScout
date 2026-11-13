@@ -82,20 +82,8 @@ def load_live_catalog():
 
 
 def item_search_url(product):
-    """Prefer a verified item URL; otherwise search for that exact item on its retailer domain."""
-    direct = product.get("item_url")
-    if direct:
-        return direct
-    source = product.get("source_url", "")
-    path = urlparse(source).path.rstrip("/")
-    # Keep known product-detail paths, not category or store landing pages.
-    if path.count("/") >= 3 and any(token in path for token in ("/p/", "/products/", "/product/")):
-        return source
-    domain = urlparse(source).netloc
-    name = product.get("product_name", "")
-    store = product.get("store", "")
-    query = quote_plus(f'site:{domain} "{name}" "{store}" Bahrain')
-    return f"https://www.google.com/search?q={query}"
+    """Open the retailer's product page when verified, otherwise its supplied listing page."""
+    return product.get("item_url") or product.get("source_url") or ""
 
 
 def product_table(rows):
@@ -105,7 +93,12 @@ def product_table(rows):
     frame = pd.DataFrame([{
         "Product": p.get("product_name", ""),
         "Store": p.get("store", ""),
-        "Area": "Bahrain-wide listing" if p.get("city") == "All Bahrain" else p.get("city", "Not specified"),
+        "Area": (
+            f'Bahrain-wide listing (included in {area} view)'
+            if p.get("city") == "All Bahrain" and area != "All Bahrain"
+            else "Bahrain-wide listing" if p.get("city") == "All Bahrain"
+            else p.get("city", "Not specified")
+        ),
         "Pack": p.get("pack_description") or "Pack not identified",
         "Price (BHD)": p.get("price"),
         "Unit price": (
@@ -128,7 +121,7 @@ def product_table(rows):
         hide_index=True,
         column_config={
             "Price (BHD)": st.column_config.NumberColumn("Price (BHD)", format="%.3f"),
-            "Item link": st.column_config.LinkColumn("Item", display_text="Find item"),
+            "Item link": st.column_config.LinkColumn("Retailer page", display_text="Open retailer"),
         },
     )
 
@@ -157,7 +150,7 @@ with st.sidebar:
     sort_by = st.selectbox("Sort results by", ["Unit price", "Total price", "Discount"])
     st.divider()
     refresh = st.button("↻ Refresh public prices", use_container_width=True)
-    st.caption("Area-specific store listings appear only where verified. Bahrain-wide online catalogues remain visible, but confirm delivery to your address at checkout.")
+    st.caption("The Hamala view includes all 154 catalogue listings across the available retailers, not only LuLu and Talabat. Listings marked Bahrain-wide are included in this view, but confirm delivery to Hamala and item availability at checkout.")
     st.markdown(f"[Open live website]({APP_URL})")
     st.markdown(f"[View source code]({GITHUB_URL})")
 
@@ -204,7 +197,7 @@ results = compare_products(filtered, criterion) if filtered else []
 # Keep the comparison area hidden until the user searches for a product.
 if search.strip():
     st.subheader(f"🔎 Price comparison for “{search.strip()}”")
-    st.caption("Item links open a verified product page when available; otherwise they search for that exact product on the retailer site.")
+    st.caption("One tap opens the retailer's product page when a direct link is available; otherwise it opens the retailer's supplied product/category listing. No Google search redirect.")
     col_a, col_b, col_c, col_d = st.columns(4)
     col_a.metric("Products in view", len(results))
     col_b.metric("Stores represented", len({p.get("store") for p in results}))
