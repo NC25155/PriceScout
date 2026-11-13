@@ -113,7 +113,7 @@ def demo_products():
         "source_url": url,
         "collected_at": CHECKED,
         "checked_at": CHECKED,
-        "data_status": "Retailer listing snapshot — confirm stock and final checkout price",
+        "data_status": "Website listing",
     } for name, category, store, price, original, quantity, unit, pack, url in ROWS]
 
     published_deals = {
