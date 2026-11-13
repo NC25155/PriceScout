@@ -301,6 +301,10 @@ with stores_tab:
         ("Lotus Food", "Online retailer; confirm delivery area at checkout", "https://lotusbh.odoo.com/"),
     ]
     stores_df = pd.DataFrame(store_rows, columns=["Store", "Known locations / coverage", "Store page"])
+    if area != "All Bahrain":
+        local_match = stores_df["Known locations / coverage"].str.contains(area, case=False, na=False)
+        online_match = stores_df["Known locations / coverage"].str.contains("online retailer|online catalogue", case=False, na=False)
+        stores_df = stores_df[local_match | online_match]
     st.dataframe(
         stores_df,
         use_container_width=True,
