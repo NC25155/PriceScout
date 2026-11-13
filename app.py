@@ -291,12 +291,12 @@ with stores_tab:
         ("Mega Mart", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
         ("Macro Mart", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
     ]
-    stores_df = pd.DataFrame(stores, columns=["Store", "Price data", "Store link"])
+    stores_df = pd.DataFrame(stores, columns=["Store", "Price data", "Store page"])
     st.dataframe(
         stores_df,
         use_container_width=True,
         hide_index=True,
-        column_config={"Store link": st.column_config.LinkColumn("Store", display_text="Open store")},
+        column_config={"Store page": st.column_config.LinkColumn("Store page", display_text="Open store")},
     )
     st.caption("Store discovery does not mean every product is in stock at every branch. More item prices will be added only when a retailer listing can be checked.")
 
