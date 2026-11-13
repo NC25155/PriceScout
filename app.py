@@ -105,7 +105,7 @@ def product_table(rows):
     frame = pd.DataFrame([{
         "Product": p.get("product_name", ""),
         "Store": p.get("store", ""),
-        "Area": p.get("city", "Not specified"),
+        "Area": "Bahrain-wide listing" if p.get("city") == "All Bahrain" else p.get("city", "Not specified"),
         "Pack": p.get("pack_description") or "Pack not identified",
         "Price (BHD)": p.get("price"),
         "Unit price": (
@@ -148,11 +148,16 @@ with st.sidebar:
         "Coffee & Tea", "Spices & Condiments", "Dates & Dried Fruit",
     ]
     category = st.selectbox("Category", categories)
-    area = st.selectbox("Area / delivery zone", ["All", "Hamala"])
+    area = st.selectbox("Area / delivery zone", [
+        "All Bahrain", "Manama", "Muharraq", "Hidd", "Riffa", "Isa Town",
+        "Hamad Town", "Sitra", "Hamala", "Saar", "Budaiya", "Juffair",
+        "Seef", "Tubli", "A'ali", "Amwaj Islands", "Arad", "Janabiyah",
+        "Sanabis", "Askar", "Zallaq", "Salmabad", "Busaiteen",
+    ])
     sort_by = st.selectbox("Sort results by", ["Unit price", "Total price", "Discount"])
     st.divider()
     refresh = st.button("↻ Refresh public prices", use_container_width=True)
-    st.caption("Hamala shows listings found for Hamala delivery. Other areas will be added as area-specific listings are verified.")
+    st.caption("Area-specific store listings appear only where verified. Bahrain-wide online catalogues remain visible, but confirm delivery to your address at checkout.")
     st.markdown(f"[Open live website]({APP_URL})")
     st.markdown(f"[View source code]({GITHUB_URL})")
 
@@ -187,8 +192,8 @@ st.caption(f"Page checked: {last_checked} · Live catalogue cache: up to 6 hours
 filtered = products[:]
 if category != "All":
     filtered = [p for p in filtered if p.get("category") == category]
-if area != "All":
-    filtered = [p for p in filtered if p.get("city") == area]
+if area != "All Bahrain":
+    filtered = [p for p in filtered if p.get("city") in ("All Bahrain", area)]
 if search.strip():
     q = search.casefold()
     filtered = [p for p in filtered if q in p.get("product_name", "").casefold()]
@@ -215,8 +220,8 @@ if search.strip():
 category_products = products[:]
 if category != "All":
     category_products = [p for p in category_products if p.get("category") == category]
-if area != "All":
-    category_products = [p for p in category_products if p.get("city") == area]
+if area != "All Bahrain":
+    category_products = [p for p in category_products if p.get("city") in ("All Bahrain", area)]
 category_results = compare_products(category_products, criterion) if category_products else []
 
 offers_tab, category_tab, history_tab, stores_tab, about_tab = st.tabs([
@@ -273,32 +278,36 @@ with history_tab:
 
 
 with stores_tab:
-    st.subheader("Stores serving Hamala")
-    st.caption("These retailers are listed for Hamala shopping or delivery. PriceScout only compares products where an item-level price was found; the others are shown here so the store coverage is clear.")
-    stores = [
-        ("Al Markazi Central Market", "Priced items available", "https://www.google.com/maps/search/?api=1&query=Al+Markazi+Central+Market+Bahrain"),
-        ("Nass Foods", "Priced items available", "https://www.google.com/maps/search/?api=1&query=Nass+Foods+Bahrain"),
-        ("Live Well", "Priced items available", "https://www.google.com/maps/search/?api=1&query=Live+Well+Hamala+Bahrain"),
-        ("Al Jazira Supermarket", "Store identified — item prices not yet added", "https://www.aljazirasupermarkets.com/corporate/stores/"),
-        ("Nesto Hypermarket", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Nesto+Hypermarket+Hamala+Bahrain"),
-        ("Danube Supermarket — Al Liwan", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Danube+Supermarket+Al+Liwan+Hamala+Bahrain"),
-        ("Midway Supermarket", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Midway+Supermarket+Hamala+Bahrain"),
-        ("Bahrain Pride", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Bahrain+Pride+Hamala+Bahrain"),
-        ("Alkhabbaz Supermarket", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Alkhabbaz+Supermarket+Hamala+Bahrain"),
-        ("Allday Market", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Allday+Market+Hamala+Bahrain"),
-        ("Ozone Super Market", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Ozone+Super+Market+Hamala+Bahrain"),
-        ("Hypermax", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
-        ("Mega Mart", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
-        ("Macro Mart", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
+    st.subheader("Grocery stores across Bahrain")
+    st.caption("Browse known supermarket locations by area. Store presence does not mean every branch carries every item; product prices are shown separately only when a retailer listing has been captured.")
+
+    store_rows = [
+        ("Alosra", "Saar, Janabiyah, Amwaj Islands, Juffair, Riffa, Durrat Al Bahrain", "https://www.alosraonline.com/"),
+        ("Nesto Hypermarket", "Hamad Town, Hamala, Manama, Riffa, Askar, Salmabad, Tubli, Muharraq", "https://www.google.com/maps/search/?api=1&query=Nesto+Hypermarket+Bahrain"),
+        ("Midway Supermarket", "Diyar Al Muharraq, Hamala, Manama, Muharraq, Riffa, Arad, Zallaq", "https://www.google.com/maps/search/?api=1&query=Midway+Supermarket+Bahrain"),
+        ("Mega Mart", "Samaheej, Manama, Juffair, Amwaj Islands, Muharraq", "https://www.google.com/maps/search/?api=1&query=Mega+Mart+Bahrain"),
+        ("Al Jazira Supermarket", "Janabiyah, Adliya, Riffa, Bu Ashira, Al Jasra, Jannusan, Juffair", "https://www.aljazirasupermarkets.com/"),
+        ("Al Muntazah", "Hamad Town, Muharraq, Arad, Hoora, Sitra, Isa Town, Riffa", "https://www.google.com/maps/search/?api=1&query=Al+Muntazah+Supermarket+Bahrain"),
+        ("Carrefour", "Manama, Seef, Budaiya, Saar, Hamad Town, Riffa, Isa Town, Juffair, Arad", "https://www.carrefourbahrain.com/"),
+        ("Ramez Hypermarket", "Riffa, Muharraq, Manama, Isa Town, Juffair, Arad, Askar", "https://www.google.com/maps/search/?api=1&query=Ramez+Hypermarket+Bahrain"),
+        ("Ansar Gallery", "Tubli, Riffa, Muharraq, Manama, Juffair", "https://www.ansargallery.bh/"),
+        ("The Sultan Center", "Hamad Town, Zayed Town, Bu Quwah", "https://www.google.com/maps/search/?api=1&query=The+Sultan+Center+Bahrain"),
+        ("Aswaq Al Helli", "Tubli, A'ali, Daih", "https://www.google.com/maps/search/?api=1&query=Aswaq+Al+Helli+Bahrain"),
+        ("LuLu Hypermarket", "Bahrain online catalogue; branch and delivery availability varies", "https://gcc.luluhypermarket.com/en-bh/"),
+        ("HyperMax", "Bahrain online catalogue; delivery area confirmed at checkout", "https://www.hypermax.com.bh/"),
+        ("Order Maza", "Online retailer; confirm delivery area at checkout", "https://ordermaza.com/"),
+        ("Shefs", "Online retailer; confirm delivery area at checkout", "https://www.shef-s.com/"),
+        ("Store To Door", "Online retailer; confirm delivery area at checkout", "https://storetodoor.bh/"),
+        ("Lotus Food", "Online retailer; confirm delivery area at checkout", "https://lotusbh.odoo.com/"),
     ]
-    stores_df = pd.DataFrame(stores, columns=["Store", "Price data", "Store page"])
+    stores_df = pd.DataFrame(store_rows, columns=["Store", "Known locations / coverage", "Store page"])
     st.dataframe(
         stores_df,
         use_container_width=True,
         hide_index=True,
         column_config={"Store page": st.column_config.LinkColumn("Store page", display_text="Open store")},
     )
-    st.caption("Store discovery does not mean every product is in stock at every branch. More item prices will be added only when a retailer listing can be checked.")
+    st.caption("Location coverage is based on published store directories and delivery-area listings. Always confirm the nearest branch or delivery eligibility before ordering.")
 
 with about_tab:
     st.subheader("About PriceScout")
