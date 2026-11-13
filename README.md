@@ -99,3 +99,14 @@ PriceScout is intended for public or authorized retail catalogue information. It
 
 - **Live app:** https://pricescout-wx3xtlw5pd82ijvlixf95w.streamlit.app/
 - **Repository:** https://github.com/NC25155/PriceScout
+
+
+## Automatic daily price history
+
+GitHub Actions is configured to run the public LuLu catalogue collector every day at **06:15 Bahrain time** (03:15 UTC). You can also start it manually from **Actions → Daily Price History → Run workflow**.
+
+Successful observations are appended to `data/pricescout_history.csv`, committed to the repository, and displayed in the app's History tab. This repository-backed CSV survives Streamlit container restarts. The collector saves at most one observation per product/store/day and fails without writing fake history if it cannot parse any products.
+
+The history begins with the first successful run; it cannot reconstruct earlier prices. Only the LuLu public catalogue currently has an automated collector. Other retailer links are not automatic feeds.
+
+If the workflow does not run, check that GitHub Actions are enabled and repository workflow permissions allow read/write access.
