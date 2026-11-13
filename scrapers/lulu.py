@@ -169,6 +169,20 @@ def _html_listing(session):
                 continue
 
             price = float(price_match.group(1))
+            old_price_node = card.select_one(
+                ".old-price, .price-old, .was-price, .product-price-old, "
+                "[data-old-price], del, s"
+            )
+            old_price = None
+            if old_price_node:
+                old_text = (
+                    old_price_node.get("data-old-price")
+                    or old_price_node.get_text(" ", strip=True)
+                )
+                old_price = _number(old_text)
+                if old_price is not None and old_price <= price:
+                    old_price = None
+
             quantity, unit = parse_quantity(name)
             link = card.select_one("a[href]")
             results.append({
@@ -176,7 +190,7 @@ def _html_listing(session):
                 "category": classify_product(name),
                 "store": "LuLu",
                 "price": price,
-                "original_price": None,
+                "original_price": old_price,
                 "quantity": quantity,
                 "unit": unit,
                 "pack_description": None,
