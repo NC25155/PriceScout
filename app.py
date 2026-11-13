@@ -73,7 +73,7 @@ def load_live_catalog():
         for row in rows:
             if row.get("product_name") and row.get("price") is not None:
                 row["city"] = "All Bahrain"
-                row["data_status"] = "Live source"
+                row["data_status"] = "Live catalogue"
                 cleaned.append(row)
         return cleaned, None
     except Exception as exc:
@@ -101,7 +101,7 @@ def product_table(rows):
             else "—"
         ),
         "Price checked": p.get("checked_at") or str(p.get("collected_at") or "")[:10],
-        "Data source": p.get("data_status", "Source listing"),
+        "Data type": p.get("data_status", "Website listing"),
         "Retailer link": p.get("source_url", ""),
     } for p in rows])
     st.dataframe(
@@ -217,7 +217,6 @@ with offers_tab:
     if not offers:
         st.info("No verified discounted products are available in this view.")
     else:
-        st.caption("Includes discounts with a retailer-listed previous price or an explicitly published discount percentage. Offer dates and stock can change; open the retailer listing to confirm.")
         product_table(offers)
 
 with category_tab:
