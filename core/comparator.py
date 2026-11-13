@@ -19,7 +19,14 @@ def compare_products(products, criterion="unit_price"):
         else:
             item["unit_price"] = None
 
-        item["discount"] = calculate_discount(price, item.get("original_price"))
+        calculated_discount = calculate_discount(price, item.get("original_price"))
+        # Some retailers publish a discount percentage without exposing the
+        # previous price. Preserve that explicit retailer-reported percentage.
+        item["discount"] = (
+            calculated_discount
+            if calculated_discount is not None
+            else item.get("discount_percent")
+        )
         results.append(item)
 
     if criterion == "discount":
