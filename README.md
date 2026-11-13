@@ -13,18 +13,19 @@ PriceScout is a Python + Streamlit project for exploring grocery listings, compa
 
 - Search and category filters
 - Bahrain retailer links and area filters
-- Unit-price normalization (kg / litre where package information is available)
-- Discount calculations when an original price is supplied by the source
-- Chicken product watchlist, including Americana chicken breast (2 kg), chicken breast fillets, chicken strips, chicken nuggets and tempura nuggets
+- Unit-price normalization (kg / litre / piece / roll where package information is available)
+- Source-linked retailer price snapshots checked 13 November 2026, alongside validated live LuLu catalogue rows when available
+- Monthly household categories: bulk rice (10 kg / 20 kg), flour, sugar, cooking oil, laundry detergent, fabric softener, cleaning products, tissues and toilet rolls
+- Regular grocery categories: chicken, eggs, milk, frozen food, vegetables, canned goods and breakfast staples
+- Discount calculations only when the retailer listing supplies both current and original prices
 - Price-history charts backed by a repository-stored CSV updated by GitHub Actions
-- Clear separation between live-collected data and illustrative sample data
 - Windows Command Prompt and Linux setup instructions
 
 ## Data and history
 
-The app attempts to collect public LuLu catalogue information and caches a successful fetch for up to six hours. A separate GitHub Actions job appends a dated observation at most once per product/store/day to a CSV file committed to the repository.
+The app includes dated, source-linked listing snapshots checked on 13 November 2026. It also attempts to collect public LuLu catalogue information and caches a successful fetch for up to six hours. Snapshot prices are not a live stock guarantee; open the retailer source link before buying.
 
-**Important:** The current public collector only covers the catalogue page configured in `scrapers/lulu.py`. Other retailer links are navigation links, not verified automated feeds. When the collector cannot confirm current prices, the app switches to clearly labelled illustrative sample data. Sample values are not live offers.
+A separate GitHub Actions job appends a dated observation at most once per product/store/day to a CSV file committed to the repository. The automated collector is currently LuLu-only. Store To Door and HyperMax rows in the snapshot are manually checked listing observations, not automated feeds.
 
 The history CSV is committed to GitHub, so it is not dependent on Streamlit's temporary container filesystem. Each successful daily collector run creates a Git commit containing the new observations.
 
