@@ -4,7 +4,7 @@ import plotly.express as px
 import streamlit as st
 
 from core.comparator import compare_products
-from scrapers.demo import demo_products, CHICKEN_WATCHLIST
+from scrapers.demo import demo_products
 from scrapers.lulu import collect_lulu
 
 APP_URL = "https://pricescout-wx3xtlw5pd82ijvlixf95w.streamlit.app/"
@@ -80,10 +80,6 @@ def load_live_catalog():
         return [], str(exc)
 
 
-def money(value):
-    return "—" if value is None else f"{value:.3f} BHD"
-
-
 def product_table(rows):
     if not rows:
         st.info("No matching products in this view.")
@@ -147,7 +143,7 @@ st.markdown(f"""
 <div class="ps-hero">
   <div class="ps-kicker">Bahrain • Grocery intelligence</div>
   <div class="ps-title">PriceScout</div>
-  <div class="ps-sub">Compare grocery prices, review product packs, and follow verified price changes.</div>
+  <div class="ps-sub">Search for a grocery item to compare prices, or browse offers and price history.</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -174,56 +170,30 @@ if search.strip():
 criterion = {"Unit price": "unit_price", "Total price": "total_price", "Discount": "discount"}[sort_by]
 results = compare_products(filtered, criterion) if filtered else []
 
-if not live_mode:
-    st.info("Sample prices are for interface testing only. They are not live offers and should not be used as current shopping prices.", icon="ℹ️")
-
-col_a, col_b, col_c, col_d = st.columns(4)
-col_a.metric("Products in view", len(results))
-col_b.metric("Stores represented", len({p.get("store") for p in results}))
-discount_count = sum(1 for p in results if (p.get("discount") or 0) > 0)
-col_c.metric("Advertised discounts", discount_count)
-col_d.metric("Data mode", "Live" if live_mode else "Sample")
-
-compare_tab, chicken_tab, offers_tab, history_tab, about_tab = st.tabs([
-    "🔎 Price comparison", "🍗 Chicken finder", "🏷️ Offers", "📈 Price history", "ℹ️ About"
-])
-
-with compare_tab:
-    st.subheader("Product comparison")
+# Keep the comparison area hidden until the user searches for a product.
+if search.strip():
+    st.subheader(f"🔎 Price comparison for “{search.strip()}”")
+    if not live_mode:
+        st.info("Sample prices are for interface testing only. They are not live offers and should not be used as current shopping prices.", icon="ℹ️")
+    col_a, col_b, col_c, col_d = st.columns(4)
+    col_a.metric("Products in view", len(results))
+    col_b.metric("Stores represented", len({p.get("store") for p in results}))
+    discount_count = sum(1 for p in results if (p.get("discount") or 0) > 0)
+    col_c.metric("Advertised discounts", discount_count)
+    col_d.metric("Data mode", "Live" if live_mode else "Sample")
     product_table(results)
     if results and live_mode:
         st.caption("Prices are taken from the public source shown by the collector. Confirm the pack and availability on the retailer site before relying on a listing.")
     elif results:
         st.caption("The rows shown are sample data. Source links open retailer storefronts, but do not verify the displayed sample price.")
 
-with chicken_tab:
-    st.subheader("Chicken products to look for")
-    st.write("The following product types are included in the catalogue watchlist. Availability and prices are not claimed unless a retailer listing is actually collected.")
-    for item in CHICKEN_WATCHLIST:
-        with st.container(border=True):
-            left, right = st.columns([4, 1])
-            with left:
-                st.markdown(f"**{item['name']}**")
-                st.caption(item["search_terms"])
-            with right:
-                st.caption("Watchlist")
-    st.divider()
-    st.markdown("**Retailer links**")
-    st.caption("These links open the retailer storefronts. They do not confirm that a specific chicken product is stocked.")
-    retailer_links = [
-        ("LuLu", "https://gcc.luluhypermarket.com/en-bh/"),
-        ("Alosra", "https://www.talabat.com/bahrain/grocery/50392/alosra-aljuffair"),
-        ("HyperMax", "https://www.talabat.com/bahrain/grocery/711604/hypermax-riffa-alshamali-north-riffa"),
-        ("Al Jazira", "https://www.talabat.com/bahrain/grocery/727495/al-jazira-supermarket-hamala"),
-        ("Talal Markets", "https://www.talabat.com/bahrain/grocery/718139/talal-markets-arad-new"),
-    ]
-    link_cols = st.columns(len(retailer_links))
-    for col, (name, url) in zip(link_cols, retailer_links):
-        col.markdown(f"[{name}]({url})")
+offers_tab, history_tab, about_tab = st.tabs([
+    "🏷️ Offers", "📈 Price history", "ℹ️ About"
+])
 
 with offers_tab:
     st.subheader("Discounts")
-    offers = [p for p in results if (p.get("discount") or 0) > 0]
+    offers = [p for p in filtered if (p.get("discount") or 0) > 0]
     if not offers:
         st.info("No verified discounted products are available in this view.")
     elif not live_mode:
@@ -268,4 +238,4 @@ with about_tab:
     st.write("- The collector does not bypass logins or access controls.")
     st.write("- Price history is appended by a scheduled daily GitHub Actions collector and stored in the repository.")
     st.markdown(f"**Project links:** [Live app]({APP_URL}) · [GitHub repository]({GITHUB_URL})")
-    st.caption("Updated interface · Bahrain retail catalogue · Python + Streamlit + SQLite")
+    st.caption("Updated interface · Bahrain retail catalogue · Python + Streamlit")
