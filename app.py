@@ -100,8 +100,19 @@ def product_table(rows):
             if p.get("discount") is not None and p.get("discount") > 0
             else "—"
         ),
+        "Price checked": p.get("checked_at") or str(p.get("collected_at") or "")[:10],
+        "Data source": p.get("data_status", "Source listing"),
+        "Retailer link": p.get("source_url", ""),
     } for p in rows])
-    st.dataframe(frame, use_container_width=True, hide_index=True)
+    st.dataframe(
+        frame,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Price (BHD)": st.column_config.NumberColumn("Price (BHD)", format="%.3f"),
+            "Retailer link": st.column_config.LinkColumn("Retailer link", display_text="Open listing"),
+        },
+    )
 
 
 with st.sidebar:
@@ -111,11 +122,12 @@ with st.sidebar:
     st.markdown("**Find products**")
     search = st.text_input("Search by name", placeholder="e.g. Americana, chicken strips")
     categories = [
-        "All", "Chicken", "Meat & Seafood", "Water", "Milk", "Dairy & Cheese",
-        "Rice", "Eggs", "Cleaning", "Bakery", "Cooking Oil",
-        "Fruits & Vegetables", "Dates & Dried Fruit", "Snacks",
-        "Frozen Food", "Beverages", "Coffee & Tea", "Canned Goods",
-        "Pasta & Noodles", "Spices & Condiments", "Personal Care",
+        "All", "Rice", "Flour & Baking", "Sugar", "Cooking Oil",
+        "Chicken", "Meat & Seafood", "Eggs", "Milk & Dairy", "Water",
+        "Laundry", "Paper & Tissue", "Cleaning", "Personal Care",
+        "Breakfast", "Canned Goods", "Pasta & Noodles", "Frozen Food",
+        "Bakery", "Fruits & Vegetables", "Snacks", "Beverages",
+        "Coffee & Tea", "Spices & Condiments", "Dates & Dried Fruit",
     ]
     category = st.selectbox("Category", categories)
     area = st.selectbox("Area", ["All", "Juffair", "Riffa", "Hamala", "Arad"])
@@ -132,12 +144,11 @@ if refresh:
 with st.spinner("Checking the public catalogue…"):
     live_products, live_error = load_live_catalog()
 
-if live_products:
-    products = live_products
-    live_mode = True
-else:
-    products = demo_products()
-    live_mode = False
+# Use source-backed catalogue snapshots even when the live scraper is
+# unavailable. Add live LuLu rows when the scraper can validate them.
+snapshot_products = demo_products()
+products = snapshot_products + live_products
+live_mode = bool(live_products)
 
 st.markdown(f"""
 <div class="ps-hero">
@@ -147,13 +158,13 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-if not live_mode:
-    if live_error:
-        st.caption(f"Sample catalogue displayed · Live source unavailable: {live_error}")
-    else:
-        st.caption("Sample catalogue displayed · Live source returned no usable product records.")
-else:
-    st.caption(f"Live LuLu catalogue · {len(products)} products loaded · Daily history collection enabled.")
+st.caption(
+    f"{len(snapshot_products)} source-backed retailer listings checked 13 Nov 2026"
+    + (f" · plus {len(live_products)} validated live LuLu listings" if live_mode else "")
+    + " · Open each retailer link to confirm current price and stock."
+)
+if live_error:
+    st.caption(f"Live LuLu refresh unavailable; showing the dated retailer snapshots instead: {live_error}")
 
 last_checked = datetime.now().astimezone().strftime("%d %b %Y, %H:%M %Z")
 st.caption(f"Page checked: {last_checked} · Catalogue cache: up to 6 hours · Sample values are clearly marked.")
@@ -173,8 +184,7 @@ results = compare_products(filtered, criterion) if filtered else []
 # Keep the comparison area hidden until the user searches for a product.
 if search.strip():
     st.subheader(f"🔎 Price comparison for “{search.strip()}”")
-    if not live_mode:
-        st.info("Sample prices are for interface testing only. They are not live offers and should not be used as current shopping prices.", icon="ℹ️")
+    st.caption("Prices are dated retailer listing snapshots unless marked as live. Check the retailer page before purchase.")
     col_a, col_b, col_c, col_d = st.columns(4)
     col_a.metric("Products in view", len(results))
     col_b.metric("Stores represented", len({p.get("store") for p in results}))
@@ -182,10 +192,8 @@ if search.strip():
     col_c.metric("Advertised discounts", discount_count)
     col_d.metric("Data mode", "Live" if live_mode else "Sample")
     product_table(results)
-    if results and live_mode:
-        st.caption("Prices are taken from the public source shown by the collector. Confirm the pack and availability on the retailer site before relying on a listing.")
-    elif results:
-        st.caption("The rows shown are sample data. Source links open retailer storefronts, but do not verify the displayed sample price.")
+    if results:
+        st.caption("Compare like-for-like pack sizes and varieties. A lower price per kg is not necessarily the same rice variety or quality.")
 
 offers_tab, history_tab, about_tab = st.tabs([
     "🏷️ Offers", "📈 Price history", "ℹ️ About"
@@ -199,10 +207,8 @@ with offers_tab:
     offers = [p for p in offer_candidates if (p.get("discount") or 0) > 0]
     if not offers:
         st.info("No verified discounted products are available in this view.")
-    elif not live_mode:
-        st.warning("These are illustrative sample discounts, not verified current offers.")
-        product_table(offers)
     else:
+        st.caption("Discounts appear only when the retailer listing provides both a current price and an original price.")
         product_table(offers)
 
 with history_tab:
