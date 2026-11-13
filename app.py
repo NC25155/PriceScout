@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from urllib.parse import quote_plus
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -81,8 +82,16 @@ def load_live_catalog():
 
 
 def item_search_url(product):
-    """Open the retailer's product page when verified, otherwise its supplied listing page."""
-    return product.get("item_url") or product.get("source_url") or ""
+    """Use a verified product URL, otherwise search Google for that exact item and retailer."""
+    direct_url = product.get("item_url")
+    if direct_url:
+        return direct_url
+    product_name = product.get("product_name", "").strip()
+    store = product.get("store", "").strip()
+    if product_name:
+        query = " ".join(part for part in (product_name, store, "Bahrain") if part)
+        return "https://www.google.com/search?q=" + quote_plus(query)
+    return product.get("source_url") or ""
 
 
 def product_table(rows):
@@ -196,7 +205,7 @@ results = compare_products(filtered, criterion) if filtered else []
 # Keep the comparison area hidden until the user searches for a product.
 if search.strip():
     st.subheader(f"🔎 Price comparison for “{search.strip()}”")
-    st.caption("One tap opens the retailer's product page when a direct link is available; otherwise it opens the retailer's supplied product/category listing. No Google search redirect.")
+    st.caption("One tap opens the verified product page when available; otherwise it searches Google for the exact product and retailer.")
     col_a, col_b, col_c, col_d = st.columns(4)
     col_a.metric("Products in view", len(results))
     col_b.metric("Stores represented", len({p.get("store") for p in results}))
