@@ -4,7 +4,6 @@ import plotly.express as px
 import streamlit as st
 
 from core.comparator import compare_products
-from core.database import initialize_database, record_observations, get_history, get_history_products
 from scrapers.demo import demo_products, CHICKEN_WATCHLIST
 from scrapers.lulu import collect_lulu
 
@@ -17,8 +16,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
-initialize_database()
 
 st.markdown("""
 <style>
@@ -121,12 +118,9 @@ with st.spinner("Checking the public catalogue…"):
 if live_products:
     products = live_products
     live_mode = True
-    # Daily de-duplication means repeated page visits do not create fake history points.
-    saved_count = record_observations(products)
 else:
     products = demo_products()
     live_mode = False
-    saved_count = 0
 
 st.markdown(f"""
 <div class="ps-hero">
@@ -137,7 +131,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 if live_mode:
-    st.success(f"Live public catalogue data loaded from LuLu. {len(products)} products found. New daily history points saved: {saved_count}.")
+    st.success(f"Live public catalogue data loaded from LuLu. {len(products)} products found. Daily history is collected automatically by GitHub Actions.")
 else:
     st.warning("Preview mode: live catalogue data could not be confirmed. The comparison below uses illustrative sample data, not verified current store prices.")
     if live_error:
