@@ -193,7 +193,10 @@ offers_tab, history_tab, about_tab = st.tabs([
 
 with offers_tab:
     st.subheader("Discounts")
-    offers = [p for p in filtered if (p.get("discount") or 0) > 0]
+    # Calculate discounts before filtering: raw scraper rows do not yet contain
+    # the derived "discount" field.
+    offer_candidates = compare_products(filtered, "discount")
+    offers = [p for p in offer_candidates if (p.get("discount") or 0) > 0]
     if not offers:
         st.info("No verified discounted products are available in this view.")
     elif not live_mode:
