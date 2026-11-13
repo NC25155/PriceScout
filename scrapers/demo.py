@@ -95,6 +95,7 @@ ROWS = [
     ("Puck Cheese Triangles", "Milk & Dairy", "LuLu", 0.720, None, 0.24, "kg", "240 g", LULU_EXCLUSIVE),
     ("Tomato", "Fruits & Vegetables", "LuLu", 0.330, None, 0.5, "kg", "500 g", LULU_EXCLUSIVE),
     ("Cucumber", "Fruits & Vegetables", "LuLu", 0.135, None, 0.5, "kg", "500 g", LULU_EXCLUSIVE),
+    ("LuLu Butter Jeera Biscuits", "Snacks", "LuLu", 0.790, 0.990, 0.72, "kg", "8 x 90 g", LULU_EXCLUSIVE),
 ]
 
 def demo_products():
