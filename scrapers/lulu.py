@@ -213,15 +213,26 @@ def extract_price(text):
 
 def classify_product(name):
     value = name.lower()
-    groups = {
-        "Chicken": ("chicken", "tender", "nugget", "nuggets", "griller"),
-        "Water": ("water",),
-        "Milk": ("milk",),
-        "Rice": ("rice",),
-        "Eggs": ("egg", "eggs"),
-        "Cleaning": ("detergent", "soap", "cleaner", "bleach"),
-    }
-    for category, words in groups.items():
+    groups = [
+        ("Rice", ("rice", "basmati", "calrose", "matta")),
+        ("Flour & Baking", ("flour", "semolina", "baking", "yeast")),
+        ("Sugar", ("sugar",)),
+        ("Cooking Oil", ("oil", "sunflower", "corn oil", "vegetable oil")),
+        ("Laundry", ("detergent", "washing powder", "fabric softener", "softener")),
+        ("Paper & Tissue", ("tissue", "toilet roll", "toilet paper", "paper towel")),
+        ("Cleaning", ("cleaner", "disinfectant", "bleach", "windex", "dishwash")),
+        ("Personal Care", ("shampoo", "toothpaste", "soap", "deodorant")),
+        ("Chicken", ("chicken", "tender", "nugget", "griller")),
+        ("Eggs", ("egg",)),
+        ("Milk & Dairy", ("milk", "cheese", "labneh", "yoghurt", "yogurt", "butter")),
+        ("Frozen Food", ("frozen", "fries", "paratha")),
+        ("Breakfast", ("oats", "cereal", "corn flakes")),
+        ("Water", ("water",)),
+        ("Fruits & Vegetables", ("tomato", "cucumber", "potato", "onion", "carrot", "apple", "banana")),
+        ("Canned Goods", ("canned", "tomato paste", "tuna", "chickpeas")),
+        ("Pasta & Noodles", ("pasta", "spaghetti", "noodles", "macaroni")),
+    ]
+    for category, words in groups:
         if any(word in value for word in words):
             return category
     return "Other"
