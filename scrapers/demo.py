@@ -21,10 +21,10 @@ ROWS = [
     ("LuLu US Style Parboiled Rice", "Rice", "LuLu", 4.190, None, 10, "kg", "10 kg", LULU_RICE),
     ("LuLu White Rice", "Rice", "LuLu", 2.190, None, 5, "kg", "5 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-white-rice-5-kg/p/1494350/"),
     ("LuLu US Style Parboiled Rice", "Rice", "LuLu", 2.190, None, 5, "kg", "5 kg", LULU_RICE),
-    ("LuLu White Raw Rice", "Rice", "LuLu", 2.390, None, 5, "kg", "5 kg", LULU_EXCLUSIVE),
-    ("LuLu Long Grain Matta Rice", "Rice", "LuLu", 2.990, None, 5, "kg", "5 kg", LULU_RICE),
-    ("Sunwhite Calrose Rice", "Rice", "LuLu", 7.780, None, 10, "kg", "10 kg", LULU_RICE),
-    ("Brahmins Long Grain Matta Rice", "Rice", "LuLu", 7.190, None, 10, "kg", "10 kg", LULU_RICE),
+    ("LuLu White Raw Rice", "Rice", "LuLu", 2.390, None, 5, "kg", "5 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-white-raw-rice-5-kg/p/1038855/"),
+    ("LuLu Long Grain Matta Rice", "Rice", "LuLu", 2.990, None, 5, "kg", "5 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-long-grain-matta-rice-5-kg/p/395441/"),
+    ("Sunwhite Calrose Rice", "Rice", "LuLu", 7.780, None, 10, "kg", "10 kg", "https://gcc.luluhypermarket.com/en-bh/sunwhite-calrose-rice-10-kg/p/13194"),
+    ("Brahmins Long Grain Matta Rice", "Rice", "LuLu", 7.190, None, 10, "kg", "10 kg", "https://gcc.luluhypermarket.com/en-bh/brahmins-long-grain-matta-rice-10-kg/p/1027854/"),
     ("LuLu Thai US Style Rice", "Rice", "LuLu", 0.990, None, 2, "kg", "2 kg", LULU_RICE),
     ("LuLu White Rice", "Rice", "LuLu", 1.190, None, 2, "kg", "2 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-white-rice-2-kg/p/1494349/"),
     ("Abu Shaiba Basmati Rice", "Rice", "Store To Door", 13.500, None, 20, "kg", "20 kg", STORE_TO_DOOR_RICE),
@@ -58,12 +58,12 @@ ROWS = [
 
     # Retailer-published hot deals: discount percentages are shown explicitly
     # by Order Maza even when the previous price is not provided in the listing.
-    ("MAZA Tomato Ketchup", "Spices & Condiments", "Order Maza", 0.720, None, 0.55, "kg", "550 g", "https://ordermaza.com/"),
-    ("MAZA All Purpose Wheat Flour", "Flour & Baking", "Order Maza", 0.495, None, 1, "kg", "1 kg", "https://ordermaza.com/"),
-    ("MAZA Soft Tissues Deluxe", "Paper & Tissue", "Order Maza", 1.350, None, 750, "sheets", "5 x 150 sheets", "https://ordermaza.com/"),
-    ("MAZA White Crystal Sugar", "Sugar", "Order Maza", 0.810, None, 2, "kg", "2 kg", "https://ordermaza.com/"),
-    ("MAZA White Crystal Sugar", "Sugar", "Order Maza", 3.510, None, 10, "kg", "10 kg", "https://ordermaza.com/"),
-    ("MAZA Sunflower Oil", "Cooking Oil", "Order Maza", 2.755, None, 2, "L", "2 L", "https://ordermaza.com/"),
+    ("MAZA Tomato Ketchup", "Spices & Condiments", "Order Maza", 0.720, None, 0.55, "kg", "550 g", "https://ordermaza.com/shop?category=special-offers"),
+    ("MAZA All Purpose Wheat Flour", "Flour & Baking", "Order Maza", 0.495, None, 1, "kg", "1 kg", "https://ordermaza.com/shop?category=special-offers"),
+    ("MAZA Soft Tissues Deluxe", "Paper & Tissue", "Order Maza", 1.350, None, 750, "sheets", "5 x 150 sheets", "https://ordermaza.com/shop?category=special-offers"),
+    ("MAZA White Crystal Sugar", "Sugar", "Order Maza", 0.810, None, 2, "kg", "2 kg", "https://ordermaza.com/shop?category=special-offers"),
+    ("MAZA White Crystal Sugar", "Sugar", "Order Maza", 3.510, None, 10, "kg", "10 kg", "https://ordermaza.com/shop?category=special-offers"),
+    ("MAZA Sunflower Oil", "Cooking Oil", "Order Maza", 2.755, None, 2, "L", "2 L", "https://ordermaza.com/shop?category=special-offers"),
 
 
 
@@ -160,8 +160,8 @@ ROWS = [
     # Flour, sugar and cooking oil.
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.580, None, 2, "kg", "2 kg", HYPERMAX_FLOUR),
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.310, None, 1, "kg", "1 kg", HYPERMAX_FLOUR),
-    ("Al Osra Fine Sugar", "Sugar", "LuLu", 3.450, None, 10, "kg", "10 kg", LULU_SAVERS),
-    ("Al Osra Fine Sugar", "Sugar", "LuLu", 2.300, None, 5, "kg", "5 kg", LULU_EXCLUSIVE),
+    ("Al Osra Fine Sugar", "Sugar", "LuLu", 3.450, None, 10, "kg", "10 kg", "https://gcc.luluhypermarket.com/en-bh/al-osra-fine-sugar-10-kg/p/471063"),
+    ("Al Osra Fine Sugar", "Sugar", "LuLu", 2.300, None, 5, "kg", "5 kg", "https://gcc.luluhypermarket.com/en-bh/al-osra-fine-sugar-5-kg/p/448301/"),
     ("LuLu Sunflower Oil", "Cooking Oil", "LuLu", 5.290, None, 5, "L", "5 L", LULU_EXCLUSIVE),
     ("Noor Sunflower Oil Value Pack", "Cooking Oil", "LuLu", 3.490, None, 3, "L", "2 x 1.5 L", LULU_SAVERS),
 
