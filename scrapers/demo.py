@@ -6,9 +6,9 @@ Retailers can change prices or stock at any time; each row links to its source.
 from datetime import date
 
 CHECKED = "2026-11-13"
-LULU_RICE = "https://gcc.luluhypermarket.com/en-bh/grocery-food-cupboard-rice-pasta-noodles-rice/"
+LULU_RICE = "https://gcc.luluhypermarket.com/en-bh/grocery-food-cupboard-rice-pasta-noodles-rice"
 LULU_SAVERS = "https://gcc.luluhypermarket.com/en-bh/lulu-savers/c/CPBHN98"
-LULU_EXCLUSIVE = "https://gcc.luluhypermarket.com/en-bh/Online-Exclusive/c/CPBHN037/"
+LULU_EXCLUSIVE = "https://gcc.luluhypermarket.com/en-bh/Online-Exclusive/c/CPBHN037"
 NASS_FOODS_HAMALA = "https://www.talabat.com/bahrain/grocery/646804/nassfoods-madinat-hamad-hamad-town?aid=1056"
 LIVE_WELL_HAMALA = "https://www.talabat.com/bahrain/grocery/689325/marketplace-by-live-well-hamala?aid=1056"
 AL_MARKAZI_HAMALA = "https://www.talabat.com/bahrain/grocery/620119/al-markazi-central-market-alnoaim?aid=1056"
@@ -18,15 +18,15 @@ STORE_TO_DOOR_RICE = "https://storetodoor.bh/product-category/grocery/"
 # name, category, store, BHD, original BHD, quantity, unit, pack, source URL
 ROWS = [
     # Rice: compare cost per kg, while keeping rice varieties visible.
-    ("LuLu US Style Parboiled Rice", "Rice", "LuLu", 4.190, None, 10, "kg", "10 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-us-style-parboiled-rice-10-kg/p/495456"),
-    ("LuLu White Rice", "Rice", "LuLu", 2.190, None, 5, "kg", "5 kg", LULU_RICE),
+    ("LuLu US Style Parboiled Rice", "Rice", "LuLu", 4.190, None, 10, "kg", "10 kg", LULU_RICE),
+    ("LuLu White Rice", "Rice", "LuLu", 2.190, None, 5, "kg", "5 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-white-rice-5-kg/p/1494350/"),
     ("LuLu US Style Parboiled Rice", "Rice", "LuLu", 2.190, None, 5, "kg", "5 kg", LULU_RICE),
     ("LuLu White Raw Rice", "Rice", "LuLu", 2.390, None, 5, "kg", "5 kg", LULU_EXCLUSIVE),
     ("LuLu Long Grain Matta Rice", "Rice", "LuLu", 2.990, None, 5, "kg", "5 kg", LULU_RICE),
     ("Sunwhite Calrose Rice", "Rice", "LuLu", 7.780, None, 10, "kg", "10 kg", LULU_RICE),
     ("Brahmins Long Grain Matta Rice", "Rice", "LuLu", 7.190, None, 10, "kg", "10 kg", LULU_RICE),
     ("LuLu Thai US Style Rice", "Rice", "LuLu", 0.990, None, 2, "kg", "2 kg", LULU_RICE),
-    ("LuLu White Rice", "Rice", "LuLu", 1.190, None, 2, "kg", "2 kg", LULU_RICE),
+    ("LuLu White Rice", "Rice", "LuLu", 1.190, None, 2, "kg", "2 kg", "https://gcc.luluhypermarket.com/en-bh/lulu-white-rice-2-kg/p/1494349/"),
     ("Abu Shaiba Basmati Rice", "Rice", "Store To Door", 13.500, None, 20, "kg", "20 kg", STORE_TO_DOOR_RICE),
     ("Fakhar Basmati Rice Aromatic", "Rice", "Store To Door", 13.900, None, 20, "kg", "20 kg", STORE_TO_DOOR_RICE),
     ("Mohsen Basmati Rice", "Rice", "Store To Door", 13.500, None, 20, "kg", "20 kg", STORE_TO_DOOR_RICE),
