@@ -233,7 +233,7 @@ def get_lulu_products():
         if not page_products or len(page_products) < PAGE_SIZE:
             break
 
-    if not products and not json_pages_worked:
+    if not products:
         products = _html_listing(session)
 
     if not products:
