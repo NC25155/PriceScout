@@ -167,7 +167,7 @@ if live_error:
     st.caption(f"Live LuLu refresh unavailable; showing the dated retailer snapshots instead: {live_error}")
 
 last_checked = datetime.now().astimezone().strftime("%d %b %Y, %H:%M %Z")
-st.caption(f"Page checked: {last_checked} · Catalogue cache: up to 6 hours · Sample values are clearly marked.")
+st.caption(f"Page checked: {last_checked} · Live catalogue cache: up to 6 hours · Retailer snapshot prices are dated and may change.")
 
 filtered = products[:]
 if category != "All":
