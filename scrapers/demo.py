@@ -53,6 +53,15 @@ ROWS = [
     ("Maza Bukhary Extra Basmati Rice", "Rice", "Order Maza", 12.000, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
     ("Maza Basmati Rice XL", "Rice", "Order Maza", 12.600, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
 
+    # Retailer-published hot deals: discount percentages are shown explicitly
+    # by Order Maza even when the previous price is not provided in the listing.
+    ("MAZA Tomato Ketchup", "Spices & Condiments", "Order Maza", 0.720, None, 0.55, "kg", "550 g", "https://ordermaza.com/"),
+    ("MAZA All Purpose Wheat Flour", "Flour & Baking", "Order Maza", 0.495, None, 1, "kg", "1 kg", "https://ordermaza.com/"),
+    ("MAZA Soft Tissues Deluxe", "Paper & Tissue", "Order Maza", 1.350, None, 750, "sheets", "5 x 150 sheets", "https://ordermaza.com/"),
+    ("MAZA White Crystal Sugar", "Sugar", "Order Maza", 0.810, None, 2, "kg", "2 kg", "https://ordermaza.com/"),
+    ("MAZA White Crystal Sugar", "Sugar", "Order Maza", 3.510, None, 10, "kg", "10 kg", "https://ordermaza.com/"),
+    ("MAZA Sunflower Oil", "Cooking Oil", "Order Maza", 2.755, None, 2, "L", "2 L", "https://ordermaza.com/"),
+
 
     # Flour, sugar and cooking oil.
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.580, None, 2, "kg", "2 kg", HYPERMAX_FLOUR),
@@ -90,7 +99,7 @@ ROWS = [
 
 def demo_products():
     """Return source-backed retailer snapshot rows for the app's catalogue."""
-    return [{
+    products = [{
         "product_name": name,
         "category": category,
         "store": store,
@@ -105,3 +114,17 @@ def demo_products():
         "checked_at": CHECKED,
         "data_status": "Retailer listing snapshot — confirm stock and final checkout price",
     } for name, category, store, price, original, quantity, unit, pack, url in ROWS]
+
+    published_deals = {
+        ("MAZA Tomato Ketchup", "Order Maza"): 10,
+        ("MAZA All Purpose Wheat Flour", "Order Maza"): 10,
+        ("MAZA Soft Tissues Deluxe", "Order Maza"): 10,
+        ("MAZA White Crystal Sugar", "Order Maza"): 10,
+        ("MAZA Sunflower Oil", "Order Maza"): 5,
+        ("Maza Basmati Rice XL", "Order Maza"): 10,
+    }
+    for item in products:
+        deal = published_deals.get((item["product_name"], item["store"]))
+        if deal is not None:
+            item["discount_percent"] = deal
+    return products
