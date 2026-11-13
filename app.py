@@ -174,6 +174,20 @@ snapshot_products = demo_products()
 products = snapshot_products + live_products
 live_mode = bool(live_products)
 
+# Offer pack-size filtering based on the selected category and area.
+size_scope = products[:]
+if category != "All":
+    size_scope = [p for p in size_scope if p.get("category") == category]
+if area != "All Bahrain":
+    size_scope = [p for p in size_scope if p.get("city") in ("All Bahrain", area)]
+size_options = sorted({
+    str(p.get("pack_description")).strip()
+    for p in size_scope
+    if p.get("pack_description") and str(p.get("pack_description")).strip()
+}, key=lambda value: value.casefold())
+with st.sidebar:
+    size_filter = st.selectbox("Pack size", ["All sizes"] + size_options)
+
 st.markdown(f"""
 <div class="ps-hero">
   <div class="ps-kicker">Bahrain • Grocery intelligence</div>
@@ -195,6 +209,8 @@ if category != "All":
     filtered = [p for p in filtered if p.get("category") == category]
 if area != "All Bahrain":
     filtered = [p for p in filtered if p.get("city") in ("All Bahrain", area)]
+if size_filter != "All sizes":
+    filtered = [p for p in filtered if str(p.get("pack_description", "")).strip() == size_filter]
 if search.strip():
     q = search.casefold()
     filtered = [p for p in filtered if q in p.get("product_name", "").casefold()]
@@ -223,6 +239,8 @@ if category != "All":
     category_products = [p for p in category_products if p.get("category") == category]
 if area != "All Bahrain":
     category_products = [p for p in category_products if p.get("city") in ("All Bahrain", area)]
+if size_filter != "All sizes":
+    category_products = [p for p in category_products if str(p.get("pack_description", "")).strip() == size_filter]
 category_results = compare_products(category_products, criterion) if category_products else []
 
 offers_tab, category_tab, history_tab, stores_tab, about_tab = st.tabs([
