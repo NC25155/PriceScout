@@ -9,6 +9,8 @@ CHECKED = "2026-11-13"
 LULU_RICE = "https://gcc.luluhypermarket.com/en-bh/grocery-food-cupboard-rice-pasta-noodles-rice/"
 LULU_SAVERS = "https://gcc.luluhypermarket.com/en-bh/lulu-savers/c/CPBHN98"
 LULU_EXCLUSIVE = "https://gcc.luluhypermarket.com/en-bh/Online-Exclusive/c/CPBHN037/"
+NASS_FOODS_HAMALA = "https://www.talabat.com/bahrain/grocery/646804/nassfoods-madinat-hamad-hamad-town?aid=1056"
+LIVE_WELL_HAMALA = "https://www.talabat.com/bahrain/grocery/689325/marketplace-by-live-well-hamala?aid=1056"
 HYPERMAX_FLOUR = "https://www.hypermax.com.bh/mafbhr/en/c/50931"
 STORE_TO_DOOR_RICE = "https://storetodoor.bh/product-category/grocery/"
 
@@ -63,6 +65,73 @@ ROWS = [
     ("MAZA Sunflower Oil", "Cooking Oil", "Order Maza", 2.755, None, 2, "L", "2 L", "https://ordermaza.com/"),
 
 
+
+    # Hamala delivery listings from Talabat menus (area-specific catalogue snapshots).
+    ("Aviko Mozzarella Fingers", "Frozen Food", "Nass Foods", 5.880, None, 1, "kg", "1 kg", NASS_FOODS_HAMALA),
+    ("Mydibel Spicy Potato Wedges", "Frozen Food", "Nass Foods", 2.300, None, 2.5, "kg", "2.5 kg", NASS_FOODS_HAMALA),
+    ("Gold Winner Sunflower Oil", "Cooking Oil", "Nass Foods", 1.634, None, 1.5, "L", "1.5 L", NASS_FOODS_HAMALA),
+    ("Gold Winner Sunflower Oil", "Cooking Oil", "Nass Foods", 5.143, None, 5, "L", "5 L", NASS_FOODS_HAMALA),
+    ("Sabrina Vegetable Oil", "Cooking Oil", "Nass Foods", 11.000, None, 18, "L", "18 L", NASS_FOODS_HAMALA),
+    ("Mara Pomace Olive Oil", "Cooking Oil", "Nass Foods", 3.630, None, 1, "L", "1 L", NASS_FOODS_HAMALA),
+    ("Mara Pomace Olive Oil", "Cooking Oil", "Nass Foods", 10.890, None, 4, "L", "4 L", NASS_FOODS_HAMALA),
+    ("Forz Sunflower Oil", "Cooking Oil", "Nass Foods", 2.100, None, 1.8, "L", "1.8 L", NASS_FOODS_HAMALA),
+    ("Duke's Corn Oil", "Cooking Oil", "Nass Foods", 2.800, None, 1.8, "L", "1.8 L", NASS_FOODS_HAMALA),
+    ("Kitchen King Supreme Basmati Rice", "Rice", "Nass Foods", 15.150, None, 20, "kg", "20 kg", NASS_FOODS_HAMALA),
+    ("Anarkali 1121 Steam Basmati Rice", "Rice", "Nass Foods", 14.170, None, 20, "kg", "20 kg", NASS_FOODS_HAMALA),
+    ("Mara Red Kidney Beans", "Canned Goods", "Nass Foods", 0.320, None, 0.4, "kg", "400 g", NASS_FOODS_HAMALA),
+    ("Mara Whole Peeled Tomatoes", "Canned Goods", "Nass Foods", 0.380, None, 0.4, "kg", "400 g", NASS_FOODS_HAMALA),
+    ("Cold Alex Okra", "Frozen Food", "Nass Foods", 0.420, None, 0.8, "kg", "2 x 400 g", NASS_FOODS_HAMALA),
+    ("Cold Alex Strawberries", "Frozen Food", "Nass Foods", 0.490, None, 0.4, "kg", "400 g", NASS_FOODS_HAMALA),
+
+    ("Dr Schar Wafer Nocciole Hazelnut", "Snacks", "Live Well", 1.650, None, 0.125, "kg", "125 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Milly Gris And Ciocc", "Snacks", "Live Well", 1.630, None, 0.052, "kg", "52 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Snacks", "Snacks", "Live Well", 2.310, None, 0.105, "kg", "105 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Digestive Choc", "Snacks", "Live Well", 2.310, None, 0.15, "kg", "150 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Corn Flakes", "Breakfast", "Live Well", 2.260, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Cereal Flakes", "Breakfast", "Live Well", 3.220, None, 0.3, "kg", "300 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Maria Biscuit", "Snacks", "Live Well", 1.630, None, 0.125, "kg", "125 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Chocolate Chip Cookie", "Snacks", "Live Well", 1.680, None, 0.1, "kg", "100 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Digestive Biscuits", "Snacks", "Live Well", 1.760, None, 0.15, "kg", "150 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Twin Bar", "Snacks", "Live Well", 1.860, None, 0.0645, "kg", "64.5 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Marble Cake", "Bakery", "Live Well", 3.360, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Salti", "Snacks", "Live Well", 2.420, None, 0.175, "kg", "175 g", LIVE_WELL_HAMALA),
+    ("Dr Schar Fette Croccanti Cracker Toast", "Snacks", "Live Well", 2.000, None, 0.15, "kg", "150 g", LIVE_WELL_HAMALA),
+    ("Schar Chocolate O'S", "Snacks", "Live Well", 2.680, None, 0.165, "kg", "165 g", LIVE_WELL_HAMALA),
+    ("Schar Sorrisi Biscuits", "Snacks", "Live Well", 2.360, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("DSC Ciocko Sticks", "Snacks", "Live Well", 2.940, None, 0.15, "kg", "150 g", LIVE_WELL_HAMALA),
+    ("Biona Organic Wholewheat Penne", "Pasta & Noodles", "Live Well", 1.650, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("Biona Organic Wholegrain Spelt Penne", "Pasta & Noodles", "Live Well", 2.100, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("Biona Spelt Fusilli", "Pasta & Noodles", "Live Well", 2.100, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("Biona Organic Asia Noodles", "Pasta & Noodles", "Live Well", 2.630, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("Better Than Noodles", "Pasta & Noodles", "Live Well", 2.070, None, 0.385, "kg", "385 g", LIVE_WELL_HAMALA),
+    ("Biona Fusilli Tri Color", "Pasta & Noodles", "Live Well", 1.850, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("BT Pasta Spirals Wholegrain", "Pasta & Noodles", "Live Well", 1.350, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("BT Pasta Penne Wholegrain", "Pasta & Noodles", "Live Well", 1.250, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("Biotropic Basic Muesli", "Breakfast", "Live Well", 2.950, None, 1, "kg", "1 kg", LIVE_WELL_HAMALA),
+    ("Turtle Multigrain Flakes Dark Chocolate", "Breakfast", "Live Well", 3.360, None, 0.3, "kg", "300 g", LIVE_WELL_HAMALA),
+    ("TC Protein Low Sugar Flakes & Granola", "Breakfast", "Live Well", 3.680, None, 0.3, "kg", "300 g", LIVE_WELL_HAMALA),
+    ("TC Oat Crunchy Dark Chocolate", "Breakfast", "Live Well", 3.360, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("TC Cocoa Smiles", "Breakfast", "Live Well", 3.100, None, 0.3, "kg", "300 g", LIVE_WELL_HAMALA),
+    ("Biona Sauerkraut", "Canned Goods", "Live Well", 2.050, None, 0.36, "kg", "360 g", LIVE_WELL_HAMALA),
+    ("BT Sweet Corn in Jar", "Canned Goods", "Live Well", 1.450, None, 0.35, "kg", "350 g", LIVE_WELL_HAMALA),
+    ("Vigo Kombucha Original", "Beverages", "Live Well", 1.650, None, 0.33, "L", "330 ml", LIVE_WELL_HAMALA),
+    ("Vigo Kombucha Schisandra", "Beverages", "Live Well", 1.650, None, 0.33, "L", "330 ml", LIVE_WELL_HAMALA),
+    ("Vigo Kombucha Acai", "Beverages", "Live Well", 1.650, None, 0.33, "L", "330 ml", LIVE_WELL_HAMALA),
+    ("RS GlutenFree Oat Drink", "Milk & Dairy", "Live Well", 1.650, None, 1, "L", "1 L", LIVE_WELL_HAMALA),
+    ("Better Than Rice", "Rice", "Live Well", 2.070, None, 0.385, "kg", "385 g", LIVE_WELL_HAMALA),
+    ("Biona Organic Mayonnaise with Sunflower Oil", "Spices & Condiments", "Live Well", 2.840, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("Biona Organic Dijon Mustard", "Spices & Condiments", "Live Well", 2.420, None, 0.2, "kg", "200 g", LIVE_WELL_HAMALA),
+    ("Biotropic Passata Tomatoes", "Canned Goods", "Live Well", 1.930, None, 0.6, "L", "600 ml", LIVE_WELL_HAMALA),
+    ("Biona Himalayan Salt Fine", "Spices & Condiments", "Live Well", 3.360, None, 0.5, "kg", "500 g", LIVE_WELL_HAMALA),
+    ("Sonnentor Bay Leaves", "Spices & Condiments", "Live Well", 1.680, None, 0.01, "kg", "10 g", LIVE_WELL_HAMALA),
+    ("Biotropic Sunflower Seed Oil for Roasting", "Cooking Oil", "Live Well", 4.150, None, 0.75, "L", "750 ml", LIVE_WELL_HAMALA),
+    ("Iliada Olive Oil", "Cooking Oil", "Live Well", 7.110, None, 0.75, "L", "750 ml", LIVE_WELL_HAMALA),
+    ("Biona Apple Cider Vinegar", "Spices & Condiments", "Live Well", 2.730, None, 0.5, "L", "500 ml", LIVE_WELL_HAMALA),
+    ("Biona Organic Coconut Palm Sugar", "Sugar", "Live Well", 2.500, None, 0.25, "kg", "250 g", LIVE_WELL_HAMALA),
+    ("BT Sesame Seed Oil", "Cooking Oil", "Live Well", 4.600, None, 0.5, "L", "500 ml", LIVE_WELL_HAMALA),
+    ("Smart Organic Dragon Chickpea Flour", "Flour & Baking", "Live Well", 1.500, None, 0.2, "kg", "200 g", LIVE_WELL_HAMALA),
+    ("Smart Organic Dragon Tapioca Flour", "Flour & Baking", "Live Well", 1.550, None, 0.2, "kg", "200 g", LIVE_WELL_HAMALA),
+
     # Flour, sugar and cooking oil.
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.580, None, 2, "kg", "2 kg", HYPERMAX_FLOUR),
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.310, None, 1, "kg", "1 kg", HYPERMAX_FLOUR),
@@ -104,7 +173,7 @@ def demo_products():
         "product_name": name,
         "category": category,
         "store": store,
-        "city": "All Bahrain",
+        "city": "Hamala" if store in {"Nass Foods", "Live Well"} else "All Bahrain",
         "price": price,
         "original_price": original,
         "quantity": quantity,
@@ -113,7 +182,7 @@ def demo_products():
         "source_url": url,
         "collected_at": CHECKED,
         "checked_at": CHECKED,
-        "data_status": "Website listing",
+        "data_status": "Talabat listing" if store in {"Nass Foods", "Live Well"} else "Website listing",
     } for name, category, store, price, original, quantity, unit, pack, url in ROWS]
 
     published_deals = {
