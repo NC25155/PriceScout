@@ -195,8 +195,17 @@ if search.strip():
     if results:
         st.caption("Compare like-for-like pack sizes and varieties. A lower price per kg is not necessarily the same rice variety or quality.")
 
-offers_tab, history_tab, about_tab = st.tabs([
-    "🏷️ Offers", "📈 Price history", "ℹ️ About"
+# Build the category view independently of the search box so this tab always
+# shows every item in the selected category (and selected area).
+category_products = products[:]
+if category != "All":
+    category_products = [p for p in category_products if p.get("category") == category]
+if area != "All":
+    category_products = [p for p in category_products if p.get("city") in (area, "All Bahrain")]
+category_results = compare_products(category_products, criterion) if category_products else []
+
+offers_tab, category_tab, history_tab, about_tab = st.tabs([
+    "🏷️ Offers", "🛍️ All category items", "📈 Price history", "ℹ️ About"
 ])
 
 with offers_tab:
@@ -211,6 +220,13 @@ with offers_tab:
         st.caption("Discounts appear only when the retailer listing provides both a current price and an original price.")
         product_table(offers)
 
+with category_tab:
+    category_label = category if category != "All" else "All categories"
+    st.subheader(f"All items — {category_label}")
+    st.caption("This list includes every catalogue item in the selected category. It is not narrowed by the search box.")
+    st.metric("Items in selected category", len(category_results))
+    product_table(category_results)
+
 with history_tab:
     st.subheader("Automatic price history")
     history_file = "data/pricescout_history.csv"
@@ -220,7 +236,7 @@ with history_tab:
         history_df = pd.DataFrame(columns=["product_name", "store", "price", "collected_at", "source_url"])
 
     if history_df.empty:
-        st.info("The scheduled collector has not saved its first successful observation yet. GitHub Actions runs daily; history appears here after a successful collection.")
+        st.info("Price history is still being built. PriceScout's automatic collector is scheduled to check prices every day and add a history point after each successful collection. The chart will appear once observations have been saved.")
     else:
         history_df["collected_at"] = pd.to_datetime(history_df["collected_at"], errors="coerce", utc=True)
         history_products = sorted(history_df["product_name"].dropna().unique().tolist())
@@ -235,7 +251,7 @@ with history_tab:
             "collected_at": "Collected (UTC)", "source_url": "Source"
         })
         st.dataframe(display.sort_values("Collected (UTC)", ascending=False), use_container_width=True, hide_index=True)
-        st.caption(f"{len(view)} saved observations · History is maintained by a daily GitHub Actions run.")
+        st.caption(f"{len(view)} saved observations · Price history is updated automatically each day when the scheduled collection succeeds.")
     st.caption("Only successfully collected public catalogue prices are recorded. A failed collection does not create a history point.")
 
 with about_tab:
