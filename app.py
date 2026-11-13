@@ -19,25 +19,46 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-:root { --ps-ink:#172033; --ps-muted:#687386; --ps-line:#e8edf3; }
-.block-container {max-width: 1380px; padding-top: 2rem; padding-bottom: 3rem;}
-[data-testid="stAppViewContainer"] {background: #f7f9fc;}
-[data-testid="stSidebar"] {background: #fff; border-right: 1px solid #e8edf3;}
-.ps-hero {padding: 1.45rem 1.6rem; border:1px solid #e5eaf2; border-radius:20px;
-background:linear-gradient(120deg,#ffffff 0%,#eef5ff 100%); margin-bottom:1rem;}
+:root {
+  color-scheme: light dark;
+  --ps-bg:#f7f9fc; --ps-panel:#ffffff; --ps-ink:#172033;
+  --ps-muted:#687386; --ps-line:#e5eaf2; --ps-soft:#eef5ff;
+}
+[data-theme="dark"], [data-testid="stAppViewContainer"][data-theme="dark"] {
+  --ps-bg:#0e1117; --ps-panel:#171b24; --ps-ink:#f1f5fb;
+  --ps-muted:#a6b0c0; --ps-line:#303846; --ps-soft:#202b3b;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --ps-bg:#0e1117; --ps-panel:#171b24; --ps-ink:#f1f5fb;
+    --ps-muted:#a6b0c0; --ps-line:#303846; --ps-soft:#202b3b;
+  }
+}
+.block-container {max-width:1380px; padding-top:2rem; padding-bottom:3rem;}
+[data-testid="stAppViewContainer"] {background:var(--ps-bg); color:var(--ps-ink);}
+[data-testid="stHeader"] {background:transparent;}
+[data-testid="stSidebar"] {background:var(--ps-panel); border-right:1px solid var(--ps-line);}
+.ps-hero {padding:1.45rem 1.6rem; border:1px solid var(--ps-line); border-radius:20px;
+background:linear-gradient(120deg,var(--ps-panel) 0%,var(--ps-soft) 100%); margin-bottom:1rem;}
 .ps-kicker {font-size:.78rem; letter-spacing:.12em; text-transform:uppercase;
-color:#536b8a; font-weight:700;}
-.ps-title {font-size:2.35rem; line-height:1.15; font-weight:800; color:#172033; margin:.25rem 0;}
-.ps-sub {color:#65738a; font-size:1rem;}
-.ps-card {background:#fff; border:1px solid #e7ecf3; border-radius:16px;
+color:var(--ps-muted); font-weight:700;}
+.ps-title {font-size:2.35rem; line-height:1.15; font-weight:800; color:var(--ps-ink); margin:.25rem 0;}
+.ps-sub {color:var(--ps-muted); font-size:1rem;}
+.ps-card {background:var(--ps-panel); border:1px solid var(--ps-line); border-radius:16px;
 padding:1rem 1.1rem; min-height:105px;}
-.ps-label {color:#69778c; font-size:.82rem; font-weight:600;}
-.ps-value {color:#172033; font-size:1.7rem; font-weight:800; margin-top:.2rem;}
-.ps-note {color:#758197; font-size:.78rem;}
-div[data-testid="stMetric"] {background:#fff; border:1px solid #e7ecf3;
+.ps-label {color:var(--ps-muted); font-size:.82rem; font-weight:600;}
+.ps-value {color:var(--ps-ink); font-size:1.7rem; font-weight:800; margin-top:.2rem;}
+.ps-note {color:var(--ps-muted); font-size:.78rem;}
+div[data-testid="stMetric"] {background:var(--ps-panel); border:1px solid var(--ps-line);
 padding:14px 16px; border-radius:15px;}
+div[data-testid="stMetric"] label, div[data-testid="stMetric"] [data-testid="stMetricValue"],
+div[data-testid="stMetric"] [data-testid="stMetricDelta"] {color:var(--ps-ink);}
 .stTabs [data-baseweb="tab-list"] {gap:8px;}
-.stTabs [data-baseweb="tab"] {border-radius:10px; padding:10px 16px; background:#fff;}
+.stTabs [data-baseweb="tab"] {border-radius:10px; padding:10px 16px;
+background:var(--ps-panel); color:var(--ps-ink);}
+.stTabs [aria-selected="true"] {border-bottom-color:#4f8cff !important;}
+[data-testid="stDataFrame"], [data-testid="stTable"] {border:1px solid var(--ps-line); border-radius:12px;}
+input, textarea {color:var(--ps-ink);}
 a {text-decoration:none;}
 </style>
 """, unsafe_allow_html=True)
@@ -130,14 +151,13 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-if live_mode:
-    st.success(f"Live public catalogue data loaded from LuLu. {len(products)} products found. Daily history is collected automatically by GitHub Actions.")
-else:
-    st.warning("Preview mode: live catalogue data could not be confirmed. The comparison below uses illustrative sample data, not verified current store prices.")
+if not live_mode:
     if live_error:
-        st.caption(f"Collector note: {live_error}")
+        st.caption(f"Sample catalogue displayed · Live source unavailable: {live_error}")
     else:
-        st.caption("The public catalogue did not return parseable product records. Try refreshing later.")
+        st.caption("Sample catalogue displayed · Live source returned no usable product records.")
+else:
+    st.caption(f"Live LuLu catalogue · {len(products)} products loaded · Daily history collection enabled.")
 
 last_checked = datetime.now().astimezone().strftime("%d %b %Y, %H:%M %Z")
 st.caption(f"Page checked: {last_checked} · Catalogue cache: up to 6 hours · Sample values are clearly marked.")
