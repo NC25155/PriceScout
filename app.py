@@ -163,9 +163,6 @@ st.caption(
     + (f" · plus {len(live_products)} validated live LuLu listings" if live_mode else "")
     + " · Open each retailer link to confirm current price and stock."
 )
-if live_error:
-    st.caption(f"Live LuLu refresh unavailable; showing the dated retailer snapshots instead: {live_error}")
-
 last_checked = datetime.now().astimezone().strftime("%d %b %Y, %H:%M %Z")
 st.caption(f"Page checked: {last_checked} · Live catalogue cache: up to 6 hours · Retailer snapshot prices are dated and may change.")
 
@@ -210,14 +207,17 @@ offers_tab, category_tab, history_tab, about_tab = st.tabs([
 
 with offers_tab:
     st.subheader("Discounts")
+    st.caption("Showing available discounts for the selected category and area, independent of the search box.")
     # Calculate discounts before filtering: raw scraper rows do not yet contain
     # the derived "discount" field.
-    offer_candidates = compare_products(filtered, "discount")
+    # Offers are based on the selected category and area, not narrowed by
+    # the product search box. Include retailer-published percentage deals too.
+    offer_candidates = compare_products(category_products, "discount")
     offers = [p for p in offer_candidates if (p.get("discount") or 0) > 0]
     if not offers:
         st.info("No verified discounted products are available in this view.")
     else:
-        st.caption("Discounts appear only when the retailer listing provides both a current price and an original price.")
+        st.caption("Includes discounts with a retailer-listed previous price or an explicitly published discount percentage. Offer dates and stock can change; open the retailer listing to confirm.")
         product_table(offers)
 
 with category_tab:
