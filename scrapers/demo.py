@@ -30,6 +30,30 @@ ROWS = [
     ("Olive Basmati Rice", "Rice", "Store To Door", 13.500, None, 20, "kg", "20 kg", STORE_TO_DOOR_RICE),
     ("Kashmir Indian Basmati Rice", "Rice", "Store To Door", 14.400, None, 20, "kg", "20 kg", STORE_TO_DOOR_RICE),
 
+    # Other Bahrain retailers and comparison sites: bulk 18–20 kg options.
+    ("Sindbad Pakistani White Rice", "Rice", "Order Maza", 9.000, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
+    ("Prawn Premium Basmati Rice", "Rice", "Shefs", 9.490, None, 20, "kg", "20 kg", "https://www.shef-s.com/collections/rice"),
+    ("Chakra Andhra Korthula Rice", "Rice", "Shefs", 5.990, None, 18, "kg", "18 kg", "https://www.shef-s.com/collections/rice"),
+    ("Jawaher Basmati Rice", "Rice", "Order Maza", 10.500, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
+    ("Al Habib Basmati Rice", "Rice", "Ansar Gallery", 10.950, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Maryam Indian Sella Basmati Rice", "Rice", "Ansar Gallery", 10.775, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Jabbal Long Grain Punjab Basmati Rice", "Rice", "Ansar Gallery", 11.075, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Kashmir Indian Basmati Rice", "Rice", "Ansar Gallery", 12.925, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Fakhar Indian Basmati Rice", "Rice", "Ansar Gallery", 12.650, 14.450, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Mohsen 21 Basmati Rice", "Rice", "Ansar Gallery", 13.995, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Mohsen Basmati 1121 Sella Rice", "Rice", "Ansar Gallery", 11.550, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Banno Basmati Rice", "Rice", "Ansar Gallery", 14.195, None, 20, "kg", "20 kg", "https://www.ansargallery.bh/en/grocery/dry-food/rice?p=2"),
+    ("Ruman Basmati Rice", "Rice", "Shefs", 11.490, None, 20, "kg", "20 kg", "https://www.shef-s.com/collections/rice"),
+    ("Al Malik 1121 Indian Premium Basmati Rice", "Rice", "Shefs", 11.960, None, 20, "kg", "20 kg", "https://www.shef-s.com/collections/rice"),
+    ("Indian Harvest Basmati Rice Value Pack", "Rice", "Shefs", 11.000, None, 20, "kg", "20 kg", "https://www.shef-s.com/collections/rice"),
+    ("Rumanain Indian Basmati Rice", "Rice", "Lotus Food", 11.550, None, 20, "kg", "20 kg", "https://lotusbh.odoo.com/shop/category/cooking-products-rice-grains-510"),
+    ("Al Khairat Steam Rice", "Rice", "Lotus Food", 11.550, None, 20, "kg", "20 kg", "https://lotusbh.odoo.com/shop/category/cooking-products-rice-grains-510"),
+    ("Zaina Sella Bukhary Basmati Rice", "Rice", "Order Maza", 11.500, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
+    ("Royal Queen Classic Basmati Rice", "Rice", "Order Maza", 12.000, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
+    ("Maza Bukhary Extra Basmati Rice", "Rice", "Order Maza", 12.000, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
+    ("Maza Basmati Rice XL", "Rice", "Order Maza", 12.600, None, 20, "kg", "20 kg", "https://ordermaza.com/shop?category=rice"),
+
+
     # Flour, sugar and cooking oil.
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.580, None, 2, "kg", "2 kg", HYPERMAX_FLOUR),
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.310, None, 1, "kg", "1 kg", HYPERMAX_FLOUR),
@@ -79,5 +103,5 @@ def demo_products():
         "source_url": url,
         "collected_at": CHECKED,
         "checked_at": CHECKED,
-        "data_status": "Retailer listing snapshot",
+        "data_status": "Retailer listing snapshot — confirm stock and final checkout price",
     } for name, category, store, price, original, quantity, unit, pack, url in ROWS]
