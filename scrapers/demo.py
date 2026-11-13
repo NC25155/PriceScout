@@ -11,6 +11,7 @@ LULU_SAVERS = "https://gcc.luluhypermarket.com/en-bh/lulu-savers/c/CPBHN98"
 LULU_EXCLUSIVE = "https://gcc.luluhypermarket.com/en-bh/Online-Exclusive/c/CPBHN037/"
 NASS_FOODS_HAMALA = "https://www.talabat.com/bahrain/grocery/646804/nassfoods-madinat-hamad-hamad-town?aid=1056"
 LIVE_WELL_HAMALA = "https://www.talabat.com/bahrain/grocery/689325/marketplace-by-live-well-hamala?aid=1056"
+AL_MARKAZI_HAMALA = "https://www.talabat.com/bahrain/grocery/620119/al-markazi-central-market-alnoaim?aid=1056"
 HYPERMAX_FLOUR = "https://www.hypermax.com.bh/mafbhr/en/c/50931"
 STORE_TO_DOOR_RICE = "https://storetodoor.bh/product-category/grocery/"
 
@@ -132,6 +133,30 @@ ROWS = [
     ("Smart Organic Dragon Chickpea Flour", "Flour & Baking", "Live Well", 1.500, None, 0.2, "kg", "200 g", LIVE_WELL_HAMALA),
     ("Smart Organic Dragon Tapioca Flour", "Flour & Baking", "Live Well", 1.550, None, 0.2, "kg", "200 g", LIVE_WELL_HAMALA),
 
+
+    ("Coconut Hard", "Fruits & Vegetables", "Al Markazi Central Market", 0.532, None, 1, "pcs", "1 piece", AL_MARKAZI_HAMALA),
+    ("Red Onion Bag", "Fruits & Vegetables", "Al Markazi Central Market", 1.640, None, 2.5, "kg", "2.5 kg", AL_MARKAZI_HAMALA),
+    ("Okra", "Fruits & Vegetables", "Al Markazi Central Market", 0.890, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Red Onion India", "Fruits & Vegetables", "Al Markazi Central Market", 0.325, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Green Chilli India", "Fruits & Vegetables", "Al Markazi Central Market", 0.790, None, 0.25, "kg", "250 g", AL_MARKAZI_HAMALA),
+    ("Lebanon Potato", "Fruits & Vegetables", "Al Markazi Central Market", 0.370, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Red Cabbage", "Fruits & Vegetables", "Al Markazi Central Market", 0.575, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Sweet Potato", "Fruits & Vegetables", "Al Markazi Central Market", 0.650, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Garlic", "Fruits & Vegetables", "Al Markazi Central Market", 0.900, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Green Seedless Lime", "Fruits & Vegetables", "Al Markazi Central Market", 0.850, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("White Peeled Onion", "Fruits & Vegetables", "Al Markazi Central Market", 0.450, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Potato", "Fruits & Vegetables", "Al Markazi Central Market", 0.385, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Red Onion Yamman", "Fruits & Vegetables", "Al Markazi Central Market", 0.340, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Ginger", "Fruits & Vegetables", "Al Markazi Central Market", 1.700, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Lemon Packet", "Fruits & Vegetables", "Al Markazi Central Market", 0.700, None, 1, "pack", "1 pack", AL_MARKAZI_HAMALA),
+    ("Turkey Lemon", "Fruits & Vegetables", "Al Markazi Central Market", 0.525, None, 0.5, "kg", "Approx. 500 g", AL_MARKAZI_HAMALA),
+    ("Red Peeled Onion", "Fruits & Vegetables", "Al Markazi Central Market", 0.550, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Fry Chilli", "Fruits & Vegetables", "Al Markazi Central Market", 0.475, None, 0.25, "kg", "250 g", AL_MARKAZI_HAMALA),
+    ("White Onion", "Fruits & Vegetables", "Al Markazi Central Market", 0.440, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("White Onion Spain", "Fruits & Vegetables", "Al Markazi Central Market", 0.850, None, 0.5, "kg", "500 g", AL_MARKAZI_HAMALA),
+    ("Red Cherry Tomato Plums", "Fruits & Vegetables", "Al Markazi Central Market", 1.100, None, 1, "pack", "1 pack", AL_MARKAZI_HAMALA),
+    ("Peeled Garlic", "Fruits & Vegetables", "Al Markazi Central Market", 0.580, None, 0.25, "kg", "250 g", AL_MARKAZI_HAMALA),
+
     # Flour, sugar and cooking oil.
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.580, None, 2, "kg", "2 kg", HYPERMAX_FLOUR),
     ("Al Matahin All Purpose Flour", "Flour & Baking", "HyperMax", 0.310, None, 1, "kg", "1 kg", HYPERMAX_FLOUR),
@@ -173,7 +198,7 @@ def demo_products():
         "product_name": name,
         "category": category,
         "store": store,
-        "city": "Hamala" if store in {"Nass Foods", "Live Well"} else "All Bahrain",
+        "city": "Hamala" if store in {"Nass Foods", "Live Well", "Al Markazi Central Market"} else "All Bahrain",
         "price": price,
         "original_price": original,
         "quantity": quantity,
@@ -182,7 +207,7 @@ def demo_products():
         "source_url": url,
         "collected_at": CHECKED,
         "checked_at": CHECKED,
-        "data_status": "Talabat listing" if store in {"Nass Foods", "Live Well"} else "Website listing",
+        "data_status": "Talabat listing" if store in {"Nass Foods", "Live Well", "Al Markazi Central Market"} else "Website listing",
     } for name, category, store, price, original, quantity, unit, pack, url in ROWS]
 
     published_deals = {
