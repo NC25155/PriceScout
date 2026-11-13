@@ -53,9 +53,13 @@ def _product_from_object(obj):
     product = obj.get("product") if isinstance(obj.get("product"), dict) else obj
     name = product.get("name") or product.get("title") or product.get("product_name")
     raw_price = product.get("price") or product.get("selling_price") or product.get("sale_price")
-    currency = str(product.get("currency_type") or product.get("currency") or "BHD").upper()
+    # Never assume a missing currency is BHD. The storefront can return
+    # regional catalogue data; accepting an unlabelled number caused AED-like
+    # values to be displayed as BHD.
+    raw_currency = product.get("currency_type") or product.get("currency")
+    currency = str(raw_currency).strip().upper() if raw_currency is not None else ""
 
-    if not name or raw_price is None:
+    if not name or raw_price is None or not currency:
         return None
     if currency not in {"BHD", "BD", "د.ب", "BH"}:
         return None
@@ -215,13 +219,10 @@ def get_lulu_products():
     session.headers.update(HEADERS)
     products = []
     seen = set()
-    json_pages_worked = False
-
     for page in range(1, MAX_PAGES + 1):
         payload = _json_listing(session, page)
         if payload is None:
             break
-        json_pages_worked = True
         page_products = _walk_products(payload)
 
         for item in page_products:
