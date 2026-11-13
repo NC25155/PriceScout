@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from urllib.parse import quote_plus, urlparse
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -80,6 +81,23 @@ def load_live_catalog():
         return [], str(exc)
 
 
+def item_search_url(product):
+    """Prefer a verified item URL; otherwise search for that exact item on its retailer domain."""
+    direct = product.get("item_url")
+    if direct:
+        return direct
+    source = product.get("source_url", "")
+    path = urlparse(source).path.rstrip("/")
+    # Keep known product-detail paths, not category or store landing pages.
+    if path.count("/") >= 3 and any(token in path for token in ("/p/", "/products/", "/product/")):
+        return source
+    domain = urlparse(source).netloc
+    name = product.get("product_name", "")
+    store = product.get("store", "")
+    query = quote_plus(f'site:{domain} "{name}" "{store}" Bahrain')
+    return f"https://www.google.com/search?q={query}"
+
+
 def product_table(rows):
     if not rows:
         st.info("No matching products in this view.")
@@ -102,7 +120,7 @@ def product_table(rows):
         ),
         "Price checked": p.get("checked_at") or str(p.get("collected_at") or "")[:10],
         "Data type": p.get("data_status", "Website listing"),
-        "Retailer link": p.get("source_url", ""),
+        "Item link": item_search_url(p),
     } for p in rows])
     st.dataframe(
         frame,
@@ -110,7 +128,7 @@ def product_table(rows):
         hide_index=True,
         column_config={
             "Price (BHD)": st.column_config.NumberColumn("Price (BHD)", format="%.3f"),
-            "Retailer link": st.column_config.LinkColumn("Retailer link", display_text="Open listing"),
+            "Item link": st.column_config.LinkColumn("Item", display_text="Find item"),
         },
     )
 
@@ -130,11 +148,11 @@ with st.sidebar:
         "Coffee & Tea", "Spices & Condiments", "Dates & Dried Fruit",
     ]
     category = st.selectbox("Category", categories)
-    area = st.selectbox("Area", ["All", "Juffair", "Riffa", "Hamala", "Arad"])
+    area = st.selectbox("Area / delivery zone", ["All", "Hamala"])
     sort_by = st.selectbox("Sort results by", ["Unit price", "Total price", "Discount"])
     st.divider()
     refresh = st.button("↻ Refresh public prices", use_container_width=True)
-    st.caption("Public catalogue refresh is cached for up to 6 hours. Historical prices are collected automatically each day by GitHub Actions.")
+    st.caption("Hamala shows listings found for Hamala delivery. Other areas will be added as area-specific listings are verified.")
     st.markdown(f"[Open live website]({APP_URL})")
     st.markdown(f"[View source code]({GITHUB_URL})")
 
@@ -170,7 +188,7 @@ filtered = products[:]
 if category != "All":
     filtered = [p for p in filtered if p.get("category") == category]
 if area != "All":
-    filtered = [p for p in filtered if p.get("city") in (area, "All Bahrain")]
+    filtered = [p for p in filtered if p.get("city") == area]
 if search.strip():
     q = search.casefold()
     filtered = [p for p in filtered if q in p.get("product_name", "").casefold()]
@@ -181,7 +199,7 @@ results = compare_products(filtered, criterion) if filtered else []
 # Keep the comparison area hidden until the user searches for a product.
 if search.strip():
     st.subheader(f"🔎 Price comparison for “{search.strip()}”")
-    st.caption("Prices are dated retailer listing snapshots unless marked as live. Check the retailer page before purchase.")
+    st.caption("Item links open a verified product page when available; otherwise they search for that exact product on the retailer site.")
     col_a, col_b, col_c, col_d = st.columns(4)
     col_a.metric("Products in view", len(results))
     col_b.metric("Stores represented", len({p.get("store") for p in results}))
@@ -198,7 +216,7 @@ category_products = products[:]
 if category != "All":
     category_products = [p for p in category_products if p.get("category") == category]
 if area != "All":
-    category_products = [p for p in category_products if p.get("city") in (area, "All Bahrain")]
+    category_products = [p for p in category_products if p.get("city") == area]
 category_results = compare_products(category_products, criterion) if category_products else []
 
 offers_tab, category_tab, history_tab, about_tab = st.tabs([
