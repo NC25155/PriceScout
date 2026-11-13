@@ -16,17 +16,17 @@ PriceScout is a Python + Streamlit project for exploring grocery listings, compa
 - Unit-price normalization (kg / litre where package information is available)
 - Discount calculations when an original price is supplied by the source
 - Chicken product watchlist, including Americana chicken breast (2 kg), chicken breast fillets, chicken strips, chicken nuggets and tempura nuggets
-- Price-history charts backed by SQLite
+- Price-history charts backed by a repository-stored CSV updated by GitHub Actions
 - Clear separation between live-collected data and illustrative sample data
 - Windows Command Prompt and Linux setup instructions
 
 ## Data and history
 
-The app attempts to collect public LuLu catalogue information and caches a successful fetch for up to six hours. A price observation is saved at most once per product/store/day.
+The app attempts to collect public LuLu catalogue information and caches a successful fetch for up to six hours. A separate GitHub Actions job appends a dated observation at most once per product/store/day to a CSV file committed to the repository.
 
 **Important:** The current public collector only covers the catalogue page configured in `scrapers/lulu.py`. Other retailer links are navigation links, not verified automated feeds. When the collector cannot confirm current prices, the app switches to clearly labelled illustrative sample data. Sample values are not live offers.
 
-For reliable history on a hosted deployment, SQLite must be placed on persistent storage. The default local database is `data/pricescout.db`; hosted container files can be replaced during redeployment. Configure `DATABASE_PATH` to a persistent mounted path or connect a managed database before relying on hosted history across restarts.
+The history CSV is committed to GitHub, so it is not dependent on Streamlit's temporary container filesystem. Each successful daily collector run creates a Git commit containing the new observations.
 
 ## Install on Windows (CMD)
 
