@@ -177,9 +177,9 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 st.caption(
-    f"{len(snapshot_products)} source-backed retailer listings checked 13 Nov 2026"
+    f"{len(snapshot_products)} priced product listings in the catalogue"
     + (f" · plus {len(live_products)} validated live LuLu listings" if live_mode else "")
-    + " · Open each retailer link to confirm current price and stock."
+    + " · Prices are snapshots; confirm the item and stock with the retailer."
 )
 last_checked = datetime.now().astimezone().strftime("%d %b %Y, %H:%M %Z")
 st.caption(f"Page checked: {last_checked} · Live catalogue cache: up to 6 hours · Retailer snapshot prices are dated and may change.")
@@ -219,8 +219,8 @@ if area != "All":
     category_products = [p for p in category_products if p.get("city") == area]
 category_results = compare_products(category_products, criterion) if category_products else []
 
-offers_tab, category_tab, history_tab, about_tab = st.tabs([
-    "🏷️ Offers", "🛍️ All category items", "📈 Price history", "ℹ️ About"
+offers_tab, category_tab, history_tab, stores_tab, about_tab = st.tabs([
+    "🏷️ Offers", "🛍️ All category items", "📈 Price history", "🏬 Stores", "ℹ️ About"
 ])
 
 with offers_tab:
@@ -271,11 +271,40 @@ with history_tab:
         st.caption(f"{len(view)} saved observations · Price history is updated automatically each day when the scheduled collection succeeds.")
     st.caption("Only successfully collected public catalogue prices are recorded. A failed collection does not create a history point.")
 
+
+with stores_tab:
+    st.subheader("Stores serving Hamala")
+    st.caption("These retailers are listed for Hamala shopping or delivery. PriceScout only compares products where an item-level price was found; the others are shown here so the store coverage is clear.")
+    stores = [
+        ("Al Markazi Central Market", "Priced items available", "https://www.google.com/maps/search/?api=1&query=Al+Markazi+Central+Market+Bahrain"),
+        ("Nass Foods", "Priced items available", "https://www.google.com/maps/search/?api=1&query=Nass+Foods+Bahrain"),
+        ("Live Well", "Priced items available", "https://www.google.com/maps/search/?api=1&query=Live+Well+Hamala+Bahrain"),
+        ("Al Jazira Supermarket", "Store identified — item prices not yet added", "https://www.aljazirasupermarkets.com/corporate/stores/"),
+        ("Nesto Hypermarket", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Nesto+Hypermarket+Hamala+Bahrain"),
+        ("Danube Supermarket — Al Liwan", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Danube+Supermarket+Al+Liwan+Hamala+Bahrain"),
+        ("Midway Supermarket", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Midway+Supermarket+Hamala+Bahrain"),
+        ("Bahrain Pride", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Bahrain+Pride+Hamala+Bahrain"),
+        ("Alkhabbaz Supermarket", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Alkhabbaz+Supermarket+Hamala+Bahrain"),
+        ("Allday Market", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Allday+Market+Hamala+Bahrain"),
+        ("Ozone Super Market", "Store identified — item prices not yet added", "https://www.google.com/maps/search/?api=1&query=Ozone+Super+Market+Hamala+Bahrain"),
+        ("Hypermax", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
+        ("Mega Mart", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
+        ("Macro Mart", "Hamala delivery listing — item prices not yet captured", "https://www.talabat.com/bahrain/groceries/1056/hamala"),
+    ]
+    stores_df = pd.DataFrame(stores, columns=["Store", "Price data", "Store link"])
+    st.dataframe(
+        stores_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={"Store link": st.column_config.LinkColumn("Store", display_text="Open store")},
+    )
+    st.caption("Store discovery does not mean every product is in stock at every branch. More item prices will be added only when a retailer listing can be checked.")
+
 with about_tab:
     st.subheader("About PriceScout")
     st.write("PriceScout is a Bahrain-focused grocery price research project. It normalizes pack sizes where possible, compares unit prices, and keeps a dated record of successfully collected public prices.")
     st.markdown("**Data integrity**")
-    st.write("- Live data is separated from illustrative sample data.")
+    st.write("- Live data is separated from dated retailer listing snapshots.")
     st.write("- A product is not labelled as in stock unless a source confirms it.")
     st.write("- The collector does not bypass logins or access controls.")
     st.write("- Price history is appended by a scheduled daily GitHub Actions collector and stored in the repository.")
