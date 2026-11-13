@@ -108,7 +108,7 @@ with st.sidebar:
     sort_by = st.selectbox("Sort results by", ["Unit price", "Total price", "Discount"])
     st.divider()
     refresh = st.button("↻ Refresh public prices", use_container_width=True)
-    st.caption("Public catalogue refresh is cached for up to 6 hours.")
+    st.caption("Public catalogue refresh is cached for up to 6 hours. Historical prices are collected automatically each day by GitHub Actions.")
     st.markdown(f"[Open live website]({APP_URL})")
     st.markdown(f"[View source code]({GITHUB_URL})")
 
@@ -219,22 +219,31 @@ with offers_tab:
         product_table(offers)
 
 with history_tab:
-    st.subheader("Observed price history")
-    history_products = get_history_products()
-    if not history_products:
-        st.info("No verified price observations have been saved yet. History starts when the public collector successfully retrieves a product price.")
+    st.subheader("Automatic price history")
+    history_file = "data/pricescout_history.csv"
+    try:
+        history_df = pd.read_csv(history_file)
+    except (FileNotFoundError, pd.errors.EmptyDataError):
+        history_df = pd.DataFrame(columns=["product_name", "store", "price", "collected_at", "source_url"])
+
+    if history_df.empty:
+        st.info("The scheduled collector has not saved its first successful observation yet. GitHub Actions runs daily; history appears here after a successful collection.")
     else:
+        history_df["collected_at"] = pd.to_datetime(history_df["collected_at"], errors="coerce", utc=True)
+        history_products = sorted(history_df["product_name"].dropna().unique().tolist())
         selected = st.selectbox("Choose a product", history_products)
-        history = get_history(selected)
-        if history:
-            df = pd.DataFrame(history, columns=["Product", "Store", "Price", "Collected"])
-            df["Collected"] = pd.to_datetime(df["Collected"], errors="coerce")
-            fig = px.line(df, x="Collected", y="Price", color="Store", markers=True,
-                          title=f"{selected} — observed prices (BHD)")
-            fig.update_layout(template="plotly_white", yaxis_title="Price (BHD)", xaxis_title="Observation date")
-            st.plotly_chart(fig, use_container_width=True)
-            st.dataframe(df.sort_values("Collected", ascending=False), use_container_width=True, hide_index=True)
-        st.caption("History records are observations, not predictions. A new point is saved at most once per product/store/day.")
+        view = history_df[history_df["product_name"] == selected].copy()
+        fig = px.line(view, x="collected_at", y="price", color="store", markers=True,
+                      title=f"{selected} — observed prices (BHD)")
+        fig.update_layout(template="plotly_white", yaxis_title="Price (BHD)", xaxis_title="Observation date")
+        st.plotly_chart(fig, use_container_width=True)
+        display = view.rename(columns={
+            "product_name": "Product", "store": "Store", "price": "Price (BHD)",
+            "collected_at": "Collected (UTC)", "source_url": "Source"
+        })
+        st.dataframe(display.sort_values("Collected (UTC)", ascending=False), use_container_width=True, hide_index=True)
+        st.caption(f"{len(view)} saved observations · History is maintained by a daily GitHub Actions run.")
+    st.caption("Only successfully collected public catalogue prices are recorded. A failed collection does not create a history point.")
 
 with about_tab:
     st.subheader("About PriceScout")
@@ -243,6 +252,6 @@ with about_tab:
     st.write("- Live data is separated from illustrative sample data.")
     st.write("- A product is not labelled as in stock unless a source confirms it.")
     st.write("- The collector does not bypass logins or access controls.")
-    st.write("- Price history is created from collected observations, not from page refreshes.")
+    st.write("- Price history is appended by a scheduled daily GitHub Actions collector and stored in the repository.")
     st.markdown(f"**Project links:** [Live app]({APP_URL}) · [GitHub repository]({GITHUB_URL})")
     st.caption("Updated interface · Bahrain retail catalogue · Python + Streamlit + SQLite")
