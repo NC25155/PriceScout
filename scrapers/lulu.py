@@ -271,11 +271,15 @@ def _json_listing(session, page):
 
         response.raise_for_status()
 
-        try:
-            payload = response.json()
-        except ValueError:
-            print("WARNING: LuLu did not return valid JSON.")
-            return None
+try:
+    payload = response.json()
+
+    print("PRODUCT SAMPLE:")
+    print(json.dumps(payload.get("products", [])[:2], indent=2)[:5000])
+
+except ValueError:
+    print("WARNING: LuLu did not return valid JSON.")
+    return None
 
         if isinstance(payload, dict):
             print(f"LuLu JSON keys: {list(payload.keys())}")
