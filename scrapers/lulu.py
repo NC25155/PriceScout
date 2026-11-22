@@ -1,7 +1,8 @@
+
 """LuLu Bahrain public catalogue scraper.
 
-Uses Akinon's documented public /list/?format=json storefront response
-first, then falls back to structured HTML when JSON is unavailable.
+Attempts the Bahrain catalogue JSON endpoint first and falls back
+to structured HTML. Prices are never fabricated.
 """
 from __future__ import annotations
 
@@ -35,49 +36,171 @@ HEADERS = {
 
 
 def _number(value):
-    """Convert a price-like value to float without guessing currencies."""
+    """Convert a price-like value to float."""
     if isinstance(value, (int, float)):
         return float(value)
+
+    if isinstance(value, dict):
+        for key in ("value", "amount", "price"):
+            if key in value:
+                result = _number(value[key])
+                if result is not None:
+                    return result
+
     if isinstance(value, str):
-        match = re.search(r"\d+(?:[.,]\d{1,3})?", value.replace(",", ""))
+        cleaned = value.replace(",", "")
+        match = re.search(r"\d+(?:\.\d{1,3})?", cleaned)
         if match:
-            return float(match.group(0).replace(",", "."))
+            try:
+                return float(match.group(0))
+            except ValueError:
+                return None
+
     return None
 
 
+def _get_price(product):
+    """Read prices from common catalogue formats."""
+    for key in (
+        "price",
+        "selling_price",
+        "sale_price",
+        "discounted_price",
+        "final_price",
+    ):
+        value = product.get(key)
+
+        if value is not None:
+            price = _number(value)
+            if price is not None:
+                return price
+
+    # Check nested pricing objects.
+    for key in ("pricing", "prices", "price_details"):
+        nested = product.get(key)
+
+        if isinstance(nested, dict):
+            for price_key in (
+                "price",
+                "selling_price",
+                "sale_price",
+                "current",
+                "value",
+                "amount",
+            ):
+                price = _number(nested.get(price_key))
+                if price is not None:
+                    return price
+
+    return None
+
+
+def _get_currency(product):
+    """Find currency information in common catalogue formats."""
+    for key in ("currency_type", "currency", "currency_code"):
+        value = product.get(key)
+
+        if isinstance(value, dict):
+            value = (
+                value.get("code")
+                or value.get("name")
+                or value.get("symbol")
+            )
+
+        if value:
+            return str(value).strip().upper()
+
+    for key in ("pricing", "prices", "price_details"):
+        nested = product.get(key)
+
+        if isinstance(nested, dict):
+            for currency_key in (
+                "currency",
+                "currency_code",
+                "currency_type",
+            ):
+                value = nested.get(currency_key)
+
+                if isinstance(value, dict):
+                    value = (
+                        value.get("code")
+                        or value.get("name")
+                        or value.get("symbol")
+                    )
+
+                if value:
+                    return str(value).strip().upper()
+
+    return ""
+
+
+def _get_name(product):
+    """Find product names from common fields."""
+    for key in (
+        "name",
+        "title",
+        "product_name",
+        "display_name",
+        "description",
+    ):
+        value = product.get(key)
+
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    return None
+
+
+def _get_url(product):
+    """Find a product URL."""
+    for key in ("absolute_url", "url", "product_url", "slug"):
+        value = product.get(key)
+
+        if isinstance(value, str) and value.strip():
+            if key == "slug":
+                return urljoin(LIST_URL, value)
+
+            return urljoin(BASE_URL, value)
+
+    return LIST_URL
+
+
 def _product_from_object(obj):
-    """Normalize one Akinon product or product-list wrapper."""
+    """Convert one JSON object into a normalized product."""
     if not isinstance(obj, dict):
         return None
 
-    product = obj.get("product") if isinstance(obj.get("product"), dict) else obj
-    name = product.get("name") or product.get("title") or product.get("product_name")
-    raw_price = product.get("price") or product.get("selling_price") or product.get("sale_price")
-    # Never assume a missing currency is BHD. The storefront can return
-    # regional catalogue data; accepting an unlabelled number caused AED-like
-    # values to be displayed as BHD.
-    raw_currency = product.get("currency_type") or product.get("currency")
-    currency = str(raw_currency).strip().upper() if raw_currency is not None else ""
+    product = obj.get("product")
+    if not isinstance(product, dict):
+        product = obj
 
-    if not name or raw_price is None or not currency:
+    name = _get_name(product)
+    price = _get_price(product)
+    currency = _get_currency(product)
+
+    if not name or price is None or price <= 0:
         return None
+
+    # Do not accept prices from unknown currencies.
     if currency not in {"BHD", "BD", "د.ب", "BH"}:
         return None
 
-    price = _number(raw_price)
-    if price is None or price <= 0:
-        return None
+    retail = None
 
-    retail = _number(
-        product.get("retail_price")
-        or product.get("original_price")
-        or product.get("list_price")
-    )
+    for key in (
+        "retail_price",
+        "original_price",
+        "list_price",
+        "old_price",
+    ):
+        retail = _number(product.get(key))
+
+        if retail is not None:
+            break
+
     if retail is not None and retail <= price:
         retail = None
 
-    path = product.get("absolute_url") or product.get("url") or ""
-    source_url = urljoin(BASE_URL, path) if path else LIST_URL
     quantity, unit = parse_quantity(str(name))
 
     return {
@@ -89,50 +212,83 @@ def _product_from_object(obj):
         "quantity": quantity,
         "unit": unit,
         "pack_description": None,
-        "source_url": source_url,
-        "collected_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "source_url": _get_url(product),
+        "collected_at": datetime.now(timezone.utc).isoformat(
+            timespec="seconds"
+        ),
     }
 
 
 def _walk_products(value):
-    """Find product-shaped dictionaries in common Akinon JSON envelopes."""
-    found = []
+    """Recursively find product-shaped objects in JSON."""
+    results = []
+
     if isinstance(value, dict):
         normalized = _product_from_object(value)
+
         if normalized:
-            found.append(normalized)
-            return found
-        for child in value.values():
-            found.extend(_walk_products(child))
+            results.append(normalized)
+        else:
+            for child in value.values():
+                results.extend(_walk_products(child))
+
     elif isinstance(value, list):
         for child in value:
-            found.extend(_walk_products(child))
-    return found
+            results.extend(_walk_products(child))
+
+    return results
 
 
 def _json_listing(session, page):
-    params = {"format": "json", "page": page, "limit": PAGE_SIZE}
-    response = session.get(LIST_URL, params=params, timeout=TIMEOUT)
-    response.raise_for_status()
+    """Fetch one JSON catalogue page."""
+    params = {
+        "format": "json",
+        "page": page,
+        "limit": PAGE_SIZE,
+    }
+
     try:
+        response = session.get(
+            LIST_URL,
+            params=params,
+            timeout=TIMEOUT,
+        )
+        response.raise_for_status()
         return response.json()
-    except (ValueError, json.JSONDecodeError):
+
+    except (requests.RequestException, ValueError):
         return None
 
 
 def _html_listing(session):
-    """Fallback parser for product cards and Product JSON-LD."""
-    response = session.get(LIST_URL, timeout=TIMEOUT)
-    response.raise_for_status()
+    """Fallback parser for product cards and JSON-LD."""
+    try:
+        response = session.get(
+            LIST_URL,
+            timeout=TIMEOUT,
+        )
+        response.raise_for_status()
+
+    except requests.RequestException:
+        return []
+
     soup = BeautifulSoup(response.text, "html.parser")
     results = []
 
-    for script in soup.select('script[type="application/ld+json"]'):
+    # Try structured JSON-LD first.
+    for script in soup.select(
+        'script[type="application/ld+json"]'
+    ):
         try:
-            results.extend(_walk_products(json.loads(script.string or script.get_text())))
+            data = json.loads(
+                script.string or script.get_text()
+            )
+            results.extend(_walk_products(data))
+
         except (ValueError, TypeError):
             continue
 
+    # Try product cards.
     selectors = [
         "[data-product]",
         ".product-card",
@@ -140,53 +296,74 @@ def _html_listing(session):
         ".product",
         "article",
     ]
+
     for selector in selectors:
         for card in soup.select(selector):
             text = card.get_text(" ", strip=True)
+
             price_match = re.search(
-                r"(\d+(?:\.\d{1,3})?)\s*(?:BHD|BD|د\.ب)",
+                r"(\d+(?:\.\d{1,3})?)\s*"
+                r"(?:BHD|BD|د\.ب)",
                 text,
                 flags=re.IGNORECASE,
             )
+
             if not price_match:
                 continue
 
             name_node = card.select_one(
-                "[data-product-name], .product-name, .product__name, "
-                ".name, h2, h3, [title]"
+                "[data-product-name], .product-name, "
+                ".product__name, .name, h2, h3, [title]"
             )
+
             name = ""
+
             if name_node:
                 name = (
                     name_node.get("data-product-name")
                     or name_node.get("title")
                     or name_node.get_text(" ", strip=True)
                 )
+
             if not name:
-                image = card.select_one("img[alt]")
-                name = image.get("alt", "") if image else ""
+                image_node = card.select_one("img[alt]")
+                name = (
+                    image_node.get("alt", "")
+                    if image_node
+                    else ""
+                )
+
             if not name:
                 continue
 
             price = float(price_match.group(1))
+
             old_price_node = card.select_one(
-                ".old-price, .price-old, .was-price, .product-price-old, "
-                "[data-old-price], del, s"
+                ".old-price, .price-old, .was-price, "
+                ".product-price-old, [data-old-price], del, s"
             )
+
             old_price = None
+
             if old_price_node:
                 old_text = (
                     old_price_node.get("data-old-price")
                     or old_price_node.get_text(" ", strip=True)
                 )
+
                 old_price = _number(old_text)
+
                 if old_price is not None and old_price <= price:
                     old_price = None
 
             quantity, unit = parse_quantity(name)
+
             link = card.select_one("a[href]")
+
             results.append({
-                "product_name": re.sub(r"\s+", " ", name).strip(),
+                "product_name": re.sub(
+                    r"\s+", " ", name
+                ).strip(),
                 "category": classify_product(name),
                 "store": "LuLu",
                 "price": price,
@@ -194,25 +371,54 @@ def _html_listing(session):
                 "quantity": quantity,
                 "unit": unit,
                 "pack_description": None,
-                "source_url": urljoin(BASE_URL, link["href"]) if link else LIST_URL,
-                "collected_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "source_url": (
+                    urljoin(BASE_URL, link["href"])
+                    if link
+                    else LIST_URL
+                ),
+                "collected_at": datetime.now(
+                    timezone.utc
+                ).isoformat(timespec="seconds"),
             })
+
         if results:
             break
 
-    return results
+    # Remove duplicates.
+    unique = []
+    seen = set()
+
+    for product in results:
+        key = (
+            product["product_name"].casefold(),
+            round(product["price"], 3),
+        )
+
+        if key not in seen:
+            seen.add(key)
+            unique.append(product)
+
+    return unique
 
 
 def extract_price(text):
-    """Compatibility helper retained for other project modules."""
+    """Compatibility helper for other project modules."""
     if not text:
         return None
-    match = re.search(r"(\d+(?:\.\d{1,3})?)\s*(?:BHD|BD)", text, re.I)
+
+    match = re.search(
+        r"(\d+(?:\.\d{1,3})?)\s*(?:BHD|BD)",
+        text,
+        re.I,
+    )
+
     return float(match.group(1)) if match else None
 
 
 def classify_product(name):
+    """Assign a basic product category."""
     value = name.lower()
+
     groups = [
         ("Rice", ("rice", "basmati", "calrose", "matta")),
         ("Flour & Baking", ("flour", "semolina", "baking", "yeast")),
@@ -232,26 +438,36 @@ def classify_product(name):
         ("Fruits & Vegetables", ("tomato", "cucumber", "potato", "onion", "carrot", "apple", "banana")),
         ("Pasta & Noodles", ("pasta", "spaghetti", "noodles", "macaroni")),
     ]
+
     for category, words in groups:
         if any(word in value for word in words):
             return category
+
     return "Other"
 
 
 def get_lulu_products():
-    """Return de-duplicated live catalogue products from LuLu Bahrain."""
+    """Collect Bahrain catalogue products without fabricating prices."""
     session = requests.Session()
     session.headers.update(HEADERS)
+
     products = []
     seen = set()
+
     for page in range(1, MAX_PAGES + 1):
         payload = _json_listing(session, page)
+
         if payload is None:
             break
+
         page_products = _walk_products(payload)
 
         for item in page_products:
-            key = (item["product_name"].casefold(), round(item["price"], 3))
+            key = (
+                item["product_name"].casefold(),
+                round(item["price"], 3),
+            )
+
             if key not in seen:
                 seen.add(key)
                 products.append(item)
@@ -259,17 +475,20 @@ def get_lulu_products():
         if not page_products or len(page_products) < PAGE_SIZE:
             break
 
+    # Try HTML if JSON did not provide usable products.
     if not products:
         products = _html_listing(session)
 
     if not products:
-        raise RuntimeError(
-            "LuLu returned no parseable Bahrain products from /list/?format=json "
-            "or the structured HTML fallback. The site may have changed or blocked "
-            "automated requests; no sample prices were substituted."
+        print(
+            "WARNING: LuLu Bahrain could not be scraped. "
+            "No prices were added for LuLu today."
         )
+        return []
+
     return products
 
 
 def collect_lulu():
+    """Compatibility function used by the daily collector."""
     return get_lulu_products()
