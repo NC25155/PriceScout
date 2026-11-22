@@ -1,9 +1,10 @@
 
 """LuLu Bahrain public catalogue scraper.
 
-Attempts the Bahrain catalogue JSON endpoint first and falls back
-to structured HTML. Prices are never fabricated.
+Diagnostic version: reports what the LuLu website returns
+so scraping problems can be identified without inventing prices.
 """
+
 from __future__ import annotations
 
 import json
@@ -50,6 +51,7 @@ def _number(value):
     if isinstance(value, str):
         cleaned = value.replace(",", "")
         match = re.search(r"\d+(?:\.\d{1,3})?", cleaned)
+
         if match:
             try:
                 return float(match.group(0))
@@ -72,10 +74,10 @@ def _get_price(product):
 
         if value is not None:
             price = _number(value)
+
             if price is not None:
                 return price
 
-    # Check nested pricing objects.
     for key in ("pricing", "prices", "price_details"):
         nested = product.get(key)
 
@@ -89,6 +91,7 @@ def _get_price(product):
                 "amount",
             ):
                 price = _number(nested.get(price_key))
+
                 if price is not None:
                     return price
 
@@ -171,6 +174,7 @@ def _product_from_object(obj):
         return None
 
     product = obj.get("product")
+
     if not isinstance(product, dict):
         product = obj
 
@@ -181,7 +185,7 @@ def _product_from_object(obj):
     if not name or price is None or price <= 0:
         return None
 
-    # Do not accept prices from unknown currencies.
+    # Accept only explicitly identified Bahraini currency.
     if currency not in {"BHD", "BD", "د.ب", "BH"}:
         return None
 
@@ -240,7 +244,7 @@ def _walk_products(value):
 
 
 def _json_listing(session, page):
-    """Fetch one JSON catalogue page."""
+    """Fetch one JSON catalogue page and print diagnostic details."""
     params = {
         "format": "json",
         "page": page,
@@ -253,10 +257,40 @@ def _json_listing(session, page):
             params=params,
             timeout=TIMEOUT,
         )
-        response.raise_for_status()
-        return response.json()
 
-    except (requests.RequestException, ValueError):
+        print(f"LuLu URL: {response.url}")
+        print(f"LuLu status: {response.status_code}")
+        print(
+            "LuLu content type: "
+            f"{response.headers.get('Content-Type')}"
+        )
+        print(
+            "LuLu response preview: "
+            f"{response.text[:1000]}"
+        )
+
+        response.raise_for_status()
+
+        try:
+            payload = response.json()
+        except ValueError:
+            print("WARNING: LuLu did not return valid JSON.")
+            return None
+
+        if isinstance(payload, dict):
+            print(f"LuLu JSON keys: {list(payload.keys())}")
+
+        sample_products = _walk_products(payload)
+
+        print(
+            f"Products recognized on page {page}: "
+            f"{len(sample_products)}"
+        )
+
+        return payload
+
+    except requests.RequestException as error:
+        print(f"LuLu request failed: {error}")
         return None
 
 
@@ -267,15 +301,28 @@ def _html_listing(session):
             LIST_URL,
             timeout=TIMEOUT,
         )
+
+        print(f"LuLu HTML status: {response.status_code}")
+        print(
+            "LuLu HTML content type: "
+            f"{response.headers.get('Content-Type')}"
+        )
+
         response.raise_for_status()
 
-    except requests.RequestException:
+    except requests.RequestException as error:
+        print(f"LuLu HTML request failed: {error}")
         return []
 
     soup = BeautifulSoup(response.text, "html.parser")
+
+    print(
+        "LuLu HTML page title: "
+        f"{soup.title.get_text(strip=True) if soup.title else 'No title'}"
+    )
+
     results = []
 
-    # Try structured JSON-LD first.
     for script in soup.select(
         'script[type="application/ld+json"]'
     ):
@@ -288,7 +335,6 @@ def _html_listing(session):
         except (ValueError, TypeError):
             continue
 
-    # Try product cards.
     selectors = [
         "[data-product]",
         ".product-card",
@@ -327,6 +373,7 @@ def _html_listing(session):
 
             if not name:
                 image_node = card.select_one("img[alt]")
+
                 name = (
                     image_node.get("alt", "")
                     if image_node
@@ -384,7 +431,6 @@ def _html_listing(session):
         if results:
             break
 
-    # Remove duplicates.
     unique = []
     seen = set()
 
@@ -397,6 +443,8 @@ def _html_listing(session):
         if key not in seen:
             seen.add(key)
             unique.append(product)
+
+    print(f"Products recognized in HTML: {len(unique)}")
 
     return unique
 
@@ -475,8 +523,8 @@ def get_lulu_products():
         if not page_products or len(page_products) < PAGE_SIZE:
             break
 
-    # Try HTML if JSON did not provide usable products.
     if not products:
+        print("Trying LuLu HTML fallback...")
         products = _html_listing(session)
 
     if not products:
@@ -486,9 +534,12 @@ def get_lulu_products():
         )
         return []
 
+    print(f"Total valid LuLu products collected: {len(products)}")
+
     return products
 
 
 def collect_lulu():
     """Compatibility function used by the daily collector."""
     return get_lulu_products()
+
