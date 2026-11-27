@@ -206,7 +206,7 @@ def _html_listing(session):
     # over time, so do not depend only on a fixed set of CSS selectors.
     # Product detail links commonly use /p/<product-id>/.
     for link in soup.select('a[href*="/p/"]'):
-        name = re.sub(r"\\s+", " ", link.get_text(" ", strip=True)).strip()
+        name = re.sub(r"\s+", " ", link.get_text(" ", strip=True)).strip()
         if len(name) < 4:
             name = (link.get("title") or link.get("aria-label") or "").strip()
         if len(name) < 4:
@@ -218,7 +218,7 @@ def _html_listing(session):
             if card is None:
                 break
             candidate = card.get_text(" ", strip=True)
-            if re.search(r"\\d+(?:\\.\\d{1,3})?\\s*(?:BHD|BD|د\\.ب)", candidate, re.I):
+            if re.search(r"\d+(?:\.\d{1,3})?\s*(?:BHD|BD|د\.ب)", candidate, re.I):
                 card_text = candidate
                 break
             card = card.parent
@@ -227,7 +227,7 @@ def _html_listing(session):
             continue
 
         price_match = re.search(
-            r"(\\d+(?:\\.\\d{1,3})?)\\s*(?:BHD|BD|د\\.ب)",
+            r"(\d+(?:\.\d{1,3})?)\s*(?:BHD|BD|د\.ب)",
             card_text,
             re.I,
         )
@@ -239,7 +239,7 @@ def _html_listing(session):
             continue
 
         all_prices = re.findall(
-            r"(\\d+(?:\\.\\d{1,3})?)\\s*(?:BHD|BD|د\\.ب)",
+            r"(\d+(?:\.\d{1,3})?)\s*(?:BHD|BD|د\.ب)",
             card_text,
             re.I,
         )
