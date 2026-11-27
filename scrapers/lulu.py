@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 
 from core.normalizer import parse_quantity
@@ -239,17 +241,38 @@ def classify_product(name):
 
 
 def get_lulu_products():
-    """Return de-duplicated live catalogue products from LuLu Bahrain."""
+    """Collect LuLu products, retrying temporary failures and trying HTML fallback."""
     session = requests.Session()
     session.headers.update(HEADERS)
+
+    retry = Retry(
+        total=3, connect=3, read=3, status=3,
+        backoff_factor=1.5,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=frozenset(["GET"]),
+        respect_retry_after_header=True,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+
     products = []
     seen = set()
-    for page in range(1, MAX_PAGES + 1):
-        payload = _json_listing(session, page)
-        if payload is None:
-            break
-        page_products = _walk_products(payload)
+    json_error = None
 
+    # Try the structured catalogue first. A request error must not skip HTML.
+    for page in range(1, MAX_PAGES + 1):
+        try:
+            payload = _json_listing(session, page)
+        except requests.RequestException as exc:
+            json_error = f"JSON catalogue request failed: {exc}"
+            break
+
+        if payload is None:
+            json_error = "JSON catalogue returned a non-JSON response."
+            break
+
+        page_products = _walk_products(payload)
         for item in page_products:
             key = (item["product_name"].casefold(), round(item["price"], 3))
             if key not in seen:
@@ -259,16 +282,33 @@ def get_lulu_products():
         if not page_products or len(page_products) < PAGE_SIZE:
             break
 
-    if not products:
+    if products:
+        return products
+
+    # Previously HTTP errors from the JSON endpoint escaped before this fallback.
+    try:
         products = _html_listing(session)
+        html_error = None
+    except requests.RequestException as exc:
+        products = []
+        html_error = f"HTML catalogue request failed: {exc}"
 
     if not products:
+        details = " ".join(part for part in (json_error, html_error) if part)
         raise RuntimeError(
-            "LuLu returned no parseable Bahrain products from /list/?format=json "
-            "or the structured HTML fallback. The site may have changed or blocked "
-            "automated requests; no sample prices were substituted."
+            "Could not collect verified LuLu Bahrain catalogue products. "
+            f"{details or 'The HTML page had no supported product cards.'} "
+            "No sample prices were substituted."
         )
-    return products
+
+    unique = []
+    seen = set()
+    for item in products:
+        key = (item["product_name"].casefold(), round(item["price"], 3))
+        if key not in seen:
+            seen.add(key)
+            unique.append(item)
+    return unique
 
 
 def collect_lulu():
